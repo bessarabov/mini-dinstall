@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+OLDDIR='/usr/lib/site-python/minidinstall'
+
+if [ "$1" = upgrade ]; then
+    if [ -d "$OLDDIR" ]; then
+	printf "Removing old optimized Python files in %s\n" "$OLDDIR"
+	for i in pyc pyo; do
+		rm -f "$OLDDIR"/*.$i
+	done
+    fi
+fi
+
+#DEBHELPER#

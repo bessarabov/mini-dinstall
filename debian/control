@@ -1,0 +1,26 @@
+Source: mini-dinstall
+Priority: optional
+Section: devel
+Maintainer: Thomas Viehmann <tv@beamnet.de>
+Build-Depends: debhelper (>= 4.1.25)
+Build-Depends-Indep: python-dev, python-support (>= 0.3)
+Standards-Version: 3.7.2
+
+Package: mini-dinstall
+Architecture: all
+Depends: ${python:Depends}, python-apt, apt-utils
+Suggests: debian-keyring
+Description: daemon for updating Debian packages in a repository
+ This program implements a miniature version of the "dinstall" program
+ which installs packages in the Debian archive.  It doesn't require a
+ PostgreSQL database, and is very easy to set up, maintain, and use.
+ mini-dinstall can be run via cron, or as a daemon.
+ .
+ This package is expressly designed for personal apt repositories, and
+ the like.  In this vein, it contains fewer sanity checks; for
+ example, it will happily install a lower version of a package.  You
+ can also generally just 'rm' files from the repository, and
+ mini-dinstall won't care.  In fact, (when run as a daemon) it will
+ automatically detect that the directory changed, and update the
+ Packages file.
+

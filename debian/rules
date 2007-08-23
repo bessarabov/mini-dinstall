@@ -1,0 +1,46 @@
+#!/usr/bin/make -f
+# $Id: rules 51 2003-12-29 20:02:19Z bob $
+# Sample debian/rules that uses debhelper. 
+# This file is public domain software, originally written by Joey Hess.
+
+build:
+
+lib/version.py: debian/changelog
+	echo "pkg_version = \"`dpkg-parsechangelog | awk '/^Version:/ { print $$2 }'`\"" > lib/version.py
+
+clean: lib/version.py
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	$(MAKE) install DESTDIR=debian/mini-dinstall
+
+# Build architecture-independent files here.
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+	dh_link
+	dh_compress
+	dh_fixperms
+	dh_pysupport
+	dh_python
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# Build architecture-dependent files here.
+binary-arch: build install
+# We have nothing to do by default.
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

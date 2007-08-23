@@ -1,0 +1,300 @@
+.\" $Id: mini-dinstall.1 59 2004-01-28 20:28:50Z bob $
+.\"
+.\" Copyright (C) 2002 Colin Walters <walters@debian.org>
+.\" Copyright (C) 2003 Graham Wilson <graham@debian.org>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"  
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\" 
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+.TH MINI\-DINSTALL 1 "December 29, 2003" "Debian Project" mini\-dinstall
+.\"
+.SH NAME
+mini\-dinstall \- daemon for updating Debian packages in a repository
+.\"
+.SH SYNOPSIS
+.B mini\-dinstall
+[\fIoptions\fP] [\fIdirectory\fP]
+.\"
+.SH DESCRIPTION
+\fBmini\-dinstall\fR is a tool for installing Debian packages into a personal
+APT repository; it is very similar to the \fBdinstall\fR tool on auric: it takes
+a changes file and installs it into the Debian archive.
+.PP
+The main focus of operation is a changes file.
+This file specifies a set of Debian binary packages, and often contains
+a source package too. Changes files are intended to group both Debian source and
+binary packages together, so that there is a single file to manipulate when
+uploading a package.
+.PP
+\fBmini-dinstall\fR takes a changes file in its \fIincoming\fR directory
+(or on its command line in batch mode), and installs the files it references
+into a directory, and sets up Packages and Sources files for use with APT.
+.\"
+.SH RUNNING
+\fBmini\-dinstall\fR can run in one of two modes: batch mode or daemon mode. In
+batch mode, the queue is process immediately, and the command exits when it is
+done. In daemon mode, which is the default, \fBmini\-dinstall\fR runs in the
+background and continually checks the queue, and will process it whenever it
+has changed.
+.PP
+The optional \fIdirectory\fR argument specifies the root directory of the
+queue. If no argument is specified, the value from the configuration file is
+used.
+.PP
+The following options can be used:
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+display extra information while running
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+display as little information as possible
+.TP
+\fB\-c\fR, \fB\-\-config\fR=\fIFILE\fR
+use FILE as the configuration file, instead of \fI~/.mini\-dinstall.conf\fR
+.TP
+\fB\-d\fR, \fB\-\-debug\fR
+output debugging information to the terminal and to the log
+.TP
+\fB\-\-no\-log\fR
+don't write any information to the logs
+.TP
+\fB\-n\fR, \fB\-\-no\-act\fR
+don't perform any changes; useful in combination with the
+.B \-v
+flag
+.TP
+\fB\-b\fR, \fB\-\-batch\fR
+run in batch mode
+.TP
+\fB\-r\fR, \fB\-\-run\fR
+tell the currently running daemon to process the queue immediately
+.TP
+\fB\-k\fR, \fB\-\-kill\fR
+kill the currently running daemon
+.TP
+\fB\-\-help\fR
+display a short overview of available options
+.TP
+\fB\-\-version\fR
+display the software version
+.\"
+.SH CONFIGURATION
+\fBmini\-dinstall\fR's main configuration file is \fI~/.mini\-dinstall.conf\fP.
+The file consists of a number of different sections, each one applying to a
+different distribution (which corresponds to the Distribution field in a
+changes file). There is also a default section (\fBDEFAULT\fP), which applies
+to all distributions.
+.PP
+Each section can contain any number of
+.PP
+.RS
+name = value
+.RE
+.PP
+combinations, which set a configuration parameter for that distribution (or the
+default one). Lists should be separated by commas, strings need only be
+enclosed with quotes if they contain spaces or commas, and boolean values
+should be 1 for true, and 0 for false.
+.PP
+The configuration parameters available in the \fBDEFAULT\fR section are as
+follows:
+.TP
+.B archivedir
+The root of the \fBmini\-dinstall\fR archive. Must be set, either here or on the
+command line.
+.TP
+.B extra_keyrings
+Additional GnuPG keyrings to use for signature verification.
+.TP
+.B incoming_permissions
+The permissions for the \fIincoming\fR directory. \fBmini\-dinstall\fR will
+attempt to set the directory's permissions at startup. Defaults to 0750.
+.TP
+.B keyrings
+GnuPG keyrings to use for signature verification of changes files. Setting this
+parameter will modify the default list; it is generally better to modify
+\fBextra_keyrings\fR instead. Defaults to the keyrings from the debian\-keyring
+package.
+.TP
+.B logfile
+The filename (relative to \fBarchivedir\fR) where information will be logged.
+Defaults to \*(lqmini-dinstall.log\*(rq.
+.TP
+.B mail_log_flush_count
+Number of log messages after which queued messages will be sent to you.
+Defaults to 10.
+.TP
+.B mail_log_flush_level
+The log level upon which to immediately send all queued log messages. Valid
+values are the same as for the \fBmail_log_level\fR option. Defaults to
+\fBERROR\fR.
+.TP
+.B mail_log_level
+The default log level which is sent to you by email. Valid values include
+\fBDEBUG\fR, \fBINFO\fR, \fBWARN\fR, \fBERROR\fR, and \fBCRITICAL\fR. Defaults
+to \fBERROR\fR.
+.TP
+.B mail_to
+The user to whom logs should be mailed. Defaults to the current user.
+.TP
+.B trigger_reindex
+In daemon mode, whether or not to recreate the Packages and Sources files after
+every upload. If you disable this, you probably want to enable
+\fBdynamic_reindex\fR. You may want to disable this if you install a \fIlot\fR
+of packages. Defaults to enabled.
+.TP
+.B use_dnotify
+If enabled, uses the \fBdnotify\fR(1) command to monitor directories for
+changes. Only relevant if \fBdynamic_reindex\fR is enabled. Defaults to false.
+.TP
+.B verify_sigs
+Whether or not to verify signatures on changes files. Defaults to enabled if
+the debian\-keyring package is installed, disabled otherwise.
+.\"
+.PP
+The configuration parameters that can be set in the \fBDEFAULT\fR section and
+the distribution-specific sections are:
+.TP
+.B architectures
+A list of architectures to create subdirectories for. Defaults to \*(lqall, i386,
+powerpc, sparc\*(rq.
+.TP
+.B archive_style
+Either \*(lqflat\*(rq or \*(lqsimple\-subdir\*(rq. A flat archive style puts all of
+the binary packages into one subdirectory, while the simple archive style
+splits up the binary packages by architecture. Must be set.
+.RS
+.PP
+Sources for the \(lqflat\(rq style should look like:
+.PP
+.NF
+.RS
+ deb file:///home/walters/debian/ unstable/
+ deb-src file:///home/walters/debian/ unstable/
+ deb file:///home/walters/debian/ experimental/
+ deb-src file:///home/walters/debian/ experimental/
+.RE
+.FI
+.PP
+Sources for the \(lqsubdir\(rq style should look like:
+.PP
+.NF
+.RS
+ deb http://localhost/~walters/debian/ local/$(ARCH)/
+ deb http://localhost/~walters/debian/ local/all/
+ deb-src http://localhost/~walters/debian/ local/source/
+.RE
+.FI
+.RE
+.TP
+.B chown_changes_files
+Determines if the changes files should be made unreadable by others. This is
+enabled by default, and is a good thing, since somebody else could unexpectedly
+upload your package. Think carefully before changing this.
+.TP
+.B dynamic_reindex
+If enabled, directories are watched for changes and new Packages and Sources
+files are created as needed. Only used in daemon mode. Defaults to true.
+.TP
+.B generate_release
+Causes a Release file to be generated (see \fBrelease_*\fR below) if enabled.
+Disabled by default.
+.TP
+.B keep_old
+Whether or not old packages should be kept, instead of deleting them when newer
+versions of the same packages are uploaded. Defaults to false.
+.TP
+.B mail_on_success
+Whether to mail on successful installation. Defaults to true.
+.TP
+.B max_retry_time
+The maximum amount of time to wait for an incomplete upload before rejecting
+it. Specified in seconds. Defaults to two days.
+.TP
+.B poll_time
+How often to poll directories (in seconds) for changes if \fBdynamic_reindex\fR
+is enabled. Defaults to 30 seconds.
+.TP
+.B post_install_script
+This script is run after the changes file is installed, with the full path of
+the changes file as its argument.
+.TP
+.B pre_install_script
+This script is run before the changes file is installed, with the full path of
+the changes file as its argument. If it exits with an error, the changes file
+is skipped.
+.TP
+.B release_codename
+The Codename field in the Release file. Defaults to \*(lqNone\*(rq.
+.TP
+.B release_description
+The Description field in the Release file. Defaults to \*(lqNone\*(rq.
+.TP
+.B release_label
+The Label field in the Release file. Defaults to the current user's username.
+.TP
+.B release_origin
+The Origin field in the Release file. Defaults to the current user's username.
+.TP
+.B release_suite
+The Suite field in the Release file. Defaults to \*(lqNone\*(rq.
+.TP
+.B release_signscript
+If specified, this script will be called to sign Release files. It will be
+invoked in the directory containing the Release file, and should accept the
+filename of the Release file to sign as the first argument (note that it is
+passed a temporary filename, not \fIRelease\fR). It should generate a detached
+signature in a file named \fIRelease.gpg\fR.
+.\"
+.SH "USING DPUT"
+One convenient way to use \fBmini-dinstall\fR is in combination with
+\fBdput\fR's \(lqlocal\(rq method. The author generally tests his Debian
+packages by using \fBdput\fR to upload them to a local repository, and then
+uses APT's \(lqfile\(rq method to retrieve them locally. Here's a sample
+\fBdput\fR stanza:
+.PP
+.NF
+.RS
+ [local]
+ fqdn = space\-ghost.verbum.private
+ incoming = /src/debian/mini\-dinstall/incoming 
+ method = local
+ run_dinstall = 0
+ post_upload_command = mini\-dinstall \-r
+.RE
+.FI
+.PP
+Obviously, you should replace the \(lqfqdn\(rq and \(lqincoming\(rq values with
+whatever is appropriate for your machine.  Some sample APT methods were listed
+in the configuration section.
+.PP
+Now, all you have to do to test your Debian packages is:
+.PP
+.NF
+.RS
+ $ dpkg-buildpackage
+ $ dput local ../program_1.2.3\-1_powerpc.changes
+ # wait a few seconds
+ $ apt\-get update
+ $ apt\-get install program
+.RE
+.FI
+.\"
+.SH AUTHOR
+.B mini\-dinstall
+was originally written by Colin Walters <walters@debian.org> and is now
+maintained by Graham Wilson <graham@debian.org>.
+.\"
+.SH "SEE ALSO"
+\fBapt\-get\fR(8), \fBdnotify\fR(1), \fBdput\fR(1), \fBgpg\fI(1)

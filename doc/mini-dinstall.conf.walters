@@ -1,0 +1,17 @@
+# Colin's mini-dinstall.conf
+
+[DEFAULT]
+architectures = all, i386, sparc, powerpc
+archivedir = /src/debian/
+use_dnotify = 0
+verify_sigs = 0
+extra_keyrings = ~/.gnupg/pubring.gpg
+mail_on_success = 0
+archive_style = flat
+poll_time = 10
+
+mail_log_level = NONE
+
+[unstable]
+
+[experimental]

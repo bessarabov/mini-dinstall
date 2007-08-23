@@ -1,0 +1,52 @@
+** IMPORTANT **
+mini-dinstall has some error checking, but it is not perfect.
+If it breaks, you get to keep both pieces.
+** IMPORTANT **
+
+First, you should probably set up a ~/.mini-dinstall.conf (or
+/etc/mini-dinstall.conf), but it's not strictly necessary; the
+defaults may suit you.  Try copying the example file.  If you do copy
+the example file, be sure to change the "mail_to" variable.
+
+mini-dinstall can be run either as a daemon (the default), or via
+cron.  
+
+To run mini-dinstall as a daemon, just type: mini-dinstall
+It will automatically create any directories necessary.  You should
+have set up a ~/.mini-dinstall.conf first.
+
+To run via cron: mini-dinstall --batch
+Running from cron is less than ideal.  Currently there is no support
+for rejecting stale uploads; plus, it's less efficient.
+
+You may find it useful to run with --no-act at first, to see what is
+going to happen without making any changes.
+
+The archive layout is not (yet) configurable.  It consists of separate
+distribution directories (the defaults are "sid" and "woody"), and
+then architecture-specific subdirectories (the defaults are "all",
+"i386", "sparc", and "powerpc").
+
+Here's what an example apt line looks like:
+
+deb http://monk.debian.net/~walters/debian/ local/$(ARCH)/
+deb http://monk.debian.net/~walters/debian/ local/all/
+deb-src http://monk.debian.net/~walters/debian/ local/source/
+
+In general, this should look like:
+
+deb <URI prefix>/<mini-dinstall directory>/ <respository>/$(ARCH)/
+deb <URI prefix>/<mini-dinstall directory>/ <respository>/all/
+deb-src <URI prefix>/<mini-dinstall directory>/ <respository>/source/
+
+mini-dinstall will pick up on any upload (i.e. .changes) you stick in
+an archive directory, and install the file.  It will automatically
+remove older versions of the package files, with one exception: if
+there are both binaries and source for a particular version, and
+you're installing a newer version .changes with source and binaries
+for a different arch, the old source will not be removed.
+
+That's it for now...enjoy!
+
+-- Colin Walters <walters@debian.org> Tue, 13 Aug 2002 15:35:09 -0400
+

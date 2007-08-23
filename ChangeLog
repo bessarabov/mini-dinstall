@@ -1,0 +1,87 @@
+2003-06-11  Colin Walters  <walters@verbum.org>
+
+	* configure.ac: Release 0.6.5.
+	
+	* mini-dinstall.in: Add - to package architecture regexps.
+
+2003-05-21  Colin Walters  <walters@verbum.org>
+
+	* configure.ac: Release 0.6.4.
+
+	* mini-dinstall.in: Fix missing argument to _install_changefile in
+	non-daemon mode.
+
+2003-05-20  Colin Walters  <walters@verbum.org>
+
+	* configure.ac: Release 0.6.3.
+
+	* mini-dinstall.in: Make --run option wait until the
+	Packages/Sources files are generated, too.
+
+2003-04-15  Colin Walters <walters@debian.org>
+	    
+	* configure.ac: Release 0.6.2.
+
+	* confiugre.ac: Make --disable-docs option work.
+
+	* mini-dinstall.in: New option chown_changes_files.
+	
+	* doc/mini-dinstall.conf: Document incoming_permissions and
+	chown_changes_files.
+
+2003-04-15  Henning Glawe <glaweh@physik.fu-berlin.de>
+   	    Colin Walters <walters@verbum.org>
+
+	* mini-dinstall.in: Only prepend dinstall_subdir to some paths
+	like logfile path if they're not already absolute.
+
+2003-04-02  Colin Walters <walters@verbum.org>
+
+	* doc/mini-dinstall.xml: Add post_upload_command.
+
+	* configure.ac: Release 0.6.1.
+
+2003-04-01  Tobias Burnus <tobias.burnus@physik.fu-berlin.de>
+
+	* mini-dinstall.in: New option incoming_permissions.
+
+2003-04-01  Henning Glawe <glaweh@physik.fu-berlin.de>
+
+	* mini-dinstall.in: New option mail_server.
+
+2003-03-26  Colin Walters  <cwalters@gnome.org>
+
+	* configure.ac: Bump version to 0.6.0.
+
+	* mini-dinstall.in: Lots of stuff.  We now support a -r
+	option for rerunning the queue immediately.  The -k option now
+	shuts down the server cleanly instead of killing it outright.
+	Another nice thing is that if a crash happens in daemon mode, it
+	will exit cleanly instead of leaving some threads hanging.
+	
+	* lib/GPGSigVerifier.py (GPGSigVerifier.verify): Remove debugging
+	output to /tmp/foo (Fixes Debian bug #184490).
+ 
+	* lib/Dnotify.py (DirectoryNotifier.__init__): Support a cancel event.
+
+2003-03-06  Colin Walters  <walters@verbum.org>
+
+	* mini-dinstall.in: Also append domain for success mails.
+
+2003-02-20  Colin Walters  <walters@gnu.org>
+
+	* mini-dinstall.in: Default to not generate release file, until
+	apt can handle it correctly.
+
+2003-02-16  Colin Walters  <walters@gnu.org>
+
+	* mini-dinstall.in: Mail to user@hostname instead of just user.
+	* Makefile.am: Fix installation libdir to just "minidinstall" instead
+	of "mini-dinstall", since Python doesn't grok - in module names.
+
+2003-01-10  Colin Walters <walters@debian.org>
+
+	* Initial generally released version.  I have discovered lots of
+	truly marvellous changes to make to the previous Debian-only build
+	system, which this ChangeLog is too small to contain.
+

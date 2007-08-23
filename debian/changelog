@@ -1,0 +1,617 @@
+mini-dinstall (0.6.21-0.1) unstable; urgency=low
+
+  * Non-maintainer upload (with maintainer permission).
+  * Update package to the new python policy (Closes: #380871).
+  * Bump Standards-Version to 3.7.2.
+  * Fix Makefile to use pyversions instead of custom hack to guess current
+    python version.
+  * Move debhelper to B-Depends (instead of B-D-I).
+
+ -- Pierre Habouzit <madcoder@debian.org>  Tue,  1 Aug 2006 21:13:37 +0200
+
+mini-dinstall (0.6.21) unstable; urgency=medium
+
+  * Improve daemonizing: Reopen file descriptors 0, 1, 2 to /dev/null.
+    This is important as it can corrupt the generated files, which is
+    why urgency medium is used.
+    Closes: #294353.
+  * Fixed a bunch of spelling mistakes in the man page. Closes: #295096.
+
+ -- Thomas Viehmann <tv@beamnet.de>  Tue, 15 Feb 2005 18:44:09 +0100
+
+mini-dinstall (0.6.20) unstable; urgency=low
+
+  * Autmatically accomodate for the current python version
+    during build. Closes: #293719.
+    Idea for patch by Tollef Fog Heen of Canonical/Ubuntu, thanks a lot.
+  * Fix man page typo. Closes: #271141.
+  * Rename example file sign-release.sh to match example config.
+    Closes: #259755.
+
+ -- Thomas Viehmann <tv@beamnet.de>  Mon,  7 Feb 2005 21:04:02 +0100
+
+mini-dinstall (0.6.19) unstable; urgency=low
+
+  * Important bug fix and very minor cosmetic update release only, maybe this
+    can make it for sarge.
+  * Retry a couple of times when dup2 returns EBUSY. (Closes: #265513)
+  * Change default distributions to unstable (only) and default
+    architectures to all, i386. (No offence to people using other arches,
+    but that's my setup.) Closes: #262700.
+
+ -- Thomas Viehmann <tv@beamnet.de>  Sun, 15 Aug 2004 11:22:38 +0200
+
+mini-dinstall (0.6.18) unstable; urgency=low
+
+  * I'm honored to be the new maintainer. (Thanks Graham.)
+  * Don't touch packages scheduled for reprocessing when rescanning,
+    also catch IOError when reprocessing changes to handle removed
+    changes files.
+    (Closes: #230325)
+  * Bumped Standards-Version: 3.6.1 (no changes necessary).
+  * Included Graham's fix for version.py generation. (Thanks.)
+
+ -- Thomas Viehmann <tv@beamnet.de>  Mon, 12 Apr 2004 21:17:20 +0200
+
+mini-dinstall (0.6.17) unstable; urgency=low
+
+  * Rebuild with a fixed build tool. (closes: #235411)
+
+ -- Graham Wilson <graham@debian.org>  Thu, 04 Mar 2004 00:32:12 +0000
+
+mini-dinstall (0.6.16) unstable; urgency=low
+
+  * Call ChangeFile.verify as it was intended. (closes: #228307)
+  * Add correct index to _archivemap[dist]. (closes: #195541)
+  * Handle ~ in filenames. (closes: #228745)
+
+ -- Graham Wilson <graham@debian.org>  Fri, 30 Jan 2004 07:11:41 +0000
+
+mini-dinstall (0.6.15) unstable; urgency=low
+
+  * Fix a typo in the man page. (closes: #230131)
+
+ -- Graham Wilson <graham@debian.org>  Wed, 28 Jan 2004 20:27:20 +0000
+
+mini-dinstall (0.6.14) unstable; urgency=low
+
+  * Only close fd's if we are daemonizing. (closes: #225439)
+
+ -- Graham Wilson <graham@debian.org>  Mon, 29 Dec 2003 22:23:43 +0000
+
+mini-dinstall (0.6.13) unstable; urgency=low
+
+  * Integrate the manual into the man page. (closes: #225363)
+
+ -- Graham Wilson <graham@debian.org>  Mon, 29 Dec 2003 06:13:47 +0000
+
+mini-dinstall (0.6.12) unstable; urgency=low
+
+  * Use consistent indentation.
+  * Man page corrections.
+  * Default architectures should be a list, not a tuple.
+  * Close all file descriptors after daemonizing. (closes: #222693)
+
+ -- Graham Wilson <graham@debian.org>  Wed, 17 Dec 2003 22:07:38 +0000
+
+mini-dinstall (0.6.11) unstable; urgency=low
+
+  * Add a complete man page.
+  * Skip over empty lines when reading changes file. (closes: #217548)
+
+ -- Graham Wilson <graham@debian.org>  Tue, 18 Nov 2003 16:04:56 +0000
+
+mini-dinstall (0.6.10) unstable; urgency=low
+
+  * Automatically generate lib/version.py from debian/rules.
+  * Call setsid(2) before the second fork, not after. (closes: #217794)
+
+ -- Graham Wilson <graham@debian.org>  Tue, 28 Oct 2003 01:18:23 +0000
+
+mini-dinstall (0.6.9) unstable; urgency=medium
+
+  * Change documentation from GNU FDL to GPL. (closes: #214488)
+  * Read dh_python(1):
+    - Build depend on python. (closes: #215044)
+    - Use ${python:Depends} in control.
+
+ -- Graham Wilson <graham@debian.org>  Fri, 10 Oct 2003 01:15:01 +0000
+
+mini-dinstall (0.6.8) unstable; urgency=low
+
+  * Fix minor whitespace problems in mini-dinstall.
+  * Correct type checking order in event queue. (closes: #212505)
+  * Explicity depend and build-depend on Python 2.3.
+  * Change DTD in manpage and manual to locally installed version.
+  * Use make instead of distutils. What was I thinking?
+  * Don't propagate exceptions that occur while logging.
+    - now we dont croak if we can't send email (closes: #213111)
+
+ -- Graham Wilson <graham@debian.org>  Mon, 29 Sep 2003 15:44:30 +0000
+
+mini-dinstall (0.6.7) unstable; urgency=low
+
+  * Use distutils instead of autotools; debhelper instead of cdbs.
+    (closes: #211462)
+  * Create a lib/version.py. Tell mini-dinstall and setup.py to use it.
+  * New maintainer. Thanks Colin.
+  * No need to build-dep on python-apt or apt-utils.
+
+ -- Graham Wilson <graham@debian.org>  Thu, 18 Sep 2003 02:25:45 +0000
+
+mini-dinstall (0.6.6) unstable; urgency=low
+
+  * Package is Debian-native again.
+  * Python 2.3 transition.
+  * Call reject_changefile with the correct number of arguments
+    (Closes: #195769)
+
+ -- Colin Walters <walters@debian.org>  Mon, 11 Aug 2003 01:23:25 -0400
+
+mini-dinstall (0.6.5-2) unstable; urgency=low
+
+  * debian/control:
+    - Bump Debhelper Build-Depends to ensure we have dh_python.
+
+ -- Colin Walters <walters@debian.org>  Mon, 23 Jun 2003 00:04:12 -0400
+
+mini-dinstall (0.6.5-1) unstable; urgency=low
+
+  * New upstream release.
+    - Adds - to architecture regexp (Closes: #189930).
+  * debian/rules:
+    - Use docbookxml.mk CDBS class.
+    - Don't ship python bytecode files (Closes: #195540).
+  * debian/mini-dinstall.preinst:
+    - Remove.
+  * debian/control:
+    - Bump Build-Depends on cdbs.
+    - Depend on python-logging instead of python2.2-logging.
+
+ -- Colin Walters <walters@debian.org>  Wed, 11 Jun 2003 04:02:57 -0400
+
+mini-dinstall (0.6.4-1) unstable; urgency=low
+
+  * New upstream release.
+    - Fixes crashing bug in batch mode, or in daemon startup when there
+    were already packages in the incoming dir (Closes: #194143).
+
+ -- Colin Walters <walters@debian.org>  Wed, 21 May 2003 12:05:53 -0400
+
+mini-dinstall (0.6.3-1) unstable; urgency=low
+
+  * The "Offin' Office Max" release.
+  * New upstream release.
+  * debian/control:
+    - Add Build-Depends on cdbs.
+    - Add Build-Depends on python-apt (Closes: #193092).    
+    - Bump Standards-Version to 3.5.10, no changes required.
+    - Downgrade debian-keyring to a Suggests, for no particular reason.
+  * debian/rules, debian/rocks:
+    - Convert to cdbs.
+
+ -- Colin Walters <walters@debian.org>  Tue, 20 May 2003 04:07:25 -0400
+
+mini-dinstall (0.6.2-2) unstable; urgency=low
+
+  * The "Archaeological Dig Uncovers Ancient Race Of Skeleton People"
+    release.
+  * debian/control:
+    - Add Build-Depends on apt-utils (Closes: #192963).
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+
+ -- Colin Walters <walters@debian.org>  Sun, 11 May 2003 18:24:09 -0400
+
+mini-dinstall (0.6.2-1) unstable; urgency=low
+
+  * The "insane little dwarf Bush" release.  (Courtesy of Mohammed
+    Saeed Al-Sahaf).
+  * New upstream release.
+    - Handles absolute path for logfile (Closes: #189007)
+    - New variable chown_changes_file (Closes: #188203)
+  * debian/control:
+    - Bump Standards-Version to 3.5.9, no changes required.
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+
+ -- Colin Walters <walters@debian.org>  Tue, 15 Apr 2003 02:11:22 -0400
+
+mini-dinstall (0.6.1-1) unstable; urgency=low
+
+  * New upstream release.
+    - New variable mail_server (Closes: #187176)
+    - New variable incoming_permissions (Closes: #187191)
+
+ -- Colin Walters <walters@debian.org>  Thu,  3 Apr 2003 00:22:36 -0500
+
+mini-dinstall (0.6.0-1) unstable; urgency=low
+
+  * The "Spring break, yay!" release.
+  * New upstream release.
+    - A number of goodies, see the upstream ChangeLog.
+    - Remove debugging output to /tmp/foo (Closes: #184490).
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+
+ -- Colin Walters <walters@debian.org>  Wed, 26 Mar 2003 18:02:19 -0500
+
+mini-dinstall (0.5.3-1) unstable; urgency=low
+
+  * The "Back that azz up" release.
+  * New upstream version.
+  * debian/control:
+    - Build-Depend on python2.2-logging (Closes: #182197).
+    - Depend on python2.2-logging instead of python-logging
+      (Closes: #183306).
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+
+ -- Colin Walters <walters@debian.org>  Thu,  6 Mar 2003 16:57:39 -0500
+
+mini-dinstall (0.5.2-1) unstable; urgency=low
+
+  * New upstream release.
+    - Disables Release file generation by default, until apt supports
+      the flat mode layout better (Closes: #176520).
+
+ -- Colin Walters <walters@debian.org>  Thu, 20 Feb 2003 23:38:23 -0500
+
+mini-dinstall (0.5.1-1) unstable; urgency=low
+
+  * New upstream release.
+    - Specify hostname when mailing stuff (Closes: #180271).
+  * debian/preinst:
+    - New file; remove old cruft from previous package version.
+
+ -- Colin Walters <walters@debian.org>  Sun, 16 Feb 2003 18:10:21 -0500
+
+mini-dinstall (0.5.0-1) unstable; urgency=low
+
+  * New upstream version.
+    - Note, this package is not Debian-native anymore.  For
+    non-Debian-specific changes, please see the upstream changelog.
+  * debian/control:
+    - Add a strict dependency on Python 2.2, for both Build-Depends and
+    Depends.
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+
+ -- Colin Walters <walters@debian.org>  Fri, 10 Jan 2003 22:03:59 -0500
+
+mini-dinstall (0.4.3) unstable; urgency=low
+
+  * Be compatible with python-logging 0.4.7.
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+  * debian/control:
+    - Depend on the latest python-logging.
+
+ -- Colin Walters <walters@debian.org>  Fri,  3 Jan 2003 17:05:01 -0500
+
+mini-dinstall (0.4.2) unstable; urgency=low
+
+  * Generate Codename field in Release files.
+  * Don't consider source and other-arch binary packges as "old" when
+    presented with a binary-only upload (Closes: #173308).
+  * Change mode of mini-dinstall/incoming directory to 0750 on startup.
+
+ -- Colin Walters <walters@debian.org>  Thu, 19 Dec 2002 22:43:00 -0500
+
+mini-dinstall (0.4.1) unstable; urgency=low
+
+  * The "Hm...how did this bug sneak by when I tested it" release.
+  * Fix option parsing to correctly respect DEFAULT section.
+  * Restore compatibility with Python 2.1. 
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+
+ -- Colin Walters <walters@debian.org>  Tue, 10 Dec 2002 15:21:06 -0500
+
+mini-dinstall (0.4.0) unstable; urgency=low
+
+  * Support for generating Release and Release.gpg.  New related options:
+    generate_release, release_signscript, release_origin, release_label,
+    release_suite, and release_description.
+  * New sample signing script: sign-release-file.sh
+  * New options trigger_reindex and dynamic_reindex; see sample
+    mini-dinstall.conf for explanation.
+  * Exit with an error if no archive_style option is specified.  You must
+    now give one of "flat" or "simple-subdir".  In the future, the default
+    will be "flat".
+  * New command line option --version.  Does the obvious thing.
+  * A fair amount of implementation cleanup (especially as related to
+    option handling).
+  * Fix version substitution.
+  * s/productname/application/ in the manual; this prevents all those
+    silly Ã¢ÂÂ¢ characters from appearing.
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+
+ -- Colin Walters <walters@debian.org>  Sun,  8 Dec 2002 21:32:16 -0500
+
+mini-dinstall (0.3.1) unstable; urgency=low
+
+  * The "Someone should report this ext bug upstream too" release.
+  * Use work in 0.3.0 to force regeneration of the Packages/Sources files,
+    even if according to the filesystem they're not changed.  This should
+    really work around the previously mentioned ext bug (Closes: #172275).
+  * Also force regeneration during the initial run.
+  * Fix the logic in the FlatArchiveDirIndexer to handle the case where
+    the Packages/Sources files are nonexistent, and clean up the logic in
+    the SimpleSubdirArchiveDirIndexer a bit.
+  * Add a quick Tips and Tricks chapter to the manual that talks about how
+    to set up dput using the local method.
+  * debian/rocks:
+    - Use docbookxml class to disable XML doctype validation.
+
+ -- Colin Walters <walters@debian.org>  Sun,  8 Dec 2002 16:34:16 -0500
+
+mini-dinstall (0.3.0) unstable; urgency=low
+
+  * The "Everyone should be using XFS" release.
+    .. or ..
+  * The "More threads == more fun" release.
+  * After installing a package, signal the indexing threads to re-index
+    immediately.  This will mostly mitigate the effects of a bug that
+    strikes the poor users of ext2 and ext3, which doesn't update the
+    mtime on a directory when renaming a file into it, if there is already
+    an existing file with that name.  Users of Real File Systems were not
+    affected :)
+  * debian/control:
+    - Fix typo in description (Closes: #169549).
+    - Bump Standards-Version to 3.5.8.
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+    
+ -- Colin Walters <walters@debian.org>  Fri,  6 Dec 2002 17:44:03 -0500
+
+mini-dinstall (0.2.18) unstable; urgency=low
+
+  * debian/rules:
+    - Update to latest version of Colin's Build System.
+  * Apply patch from Masato Taruishi <taru@valinux.co.jp> to make the -c
+    option work (Closes: #170248).
+
+ -- Colin Walters <walters@debian.org>  Mon, 25 Nov 2002 11:40:22 -0500
+
+mini-dinstall (0.2.17) unstable; urgency=low
+
+  * debian/control:
+    - Remove Build-Depends on python and python-logging (Closes: #166660).
+    - Add Build-Depends on debhelper. 
+  * debian/rules:
+    - Use Colin's Build System.
+  * Don't install CVS directories in doc dir (Closes: #166286).
+  * Add Makefile.
+  * Add the beginnings of a new spiffy XML manual.
+  * Convert SGML manpage into XML.  Now just point users to the manual.
+
+ -- Colin Walters <walters@debian.org>  Thu, 14 Nov 2002 17:08:42 -0500
+
+mini-dinstall (0.2.16) unstable; urgency=low
+
+  * Pass keychain options down to ArchiveDirs.  It would be nice if Python
+    had a real compiler which allowed one to check for these kinds of
+    errors.  I mean, I like Python (especially the syntax) and all, but
+    why does "scripting language" imply "no static type analysis" and "no
+    lexical variable analysis"?  Other languages like Dylan handle this
+    really elegantly, by allowing OPTIONAL type declarations.
+    Unfortunately the Gwydion Dylan implementation doesn't have stuff like
+    threading yet.  But maybe someday I will rewrite mini-dinstall in it.
+    Or invent my own non-sucky programming language...but for now, this
+    (Closes: #165163).
+
+ -- Colin Walters <walters@debian.org>  Thu, 17 Oct 2002 16:28:31 -0400
+
+mini-dinstall (0.2.15) unstable; urgency=low
+
+  * Changes by Roland Mas <lolando@debian.org>:
+    - Fixed logic to determine whether to generate Packages and Sources
+      files.
+    - Removed a shebang line from a module (makes lintian happy).
+  * Change documentation to refer to 'verify_sigs' instead of
+    'verify_signatures' (Closes: #164992).
+
+ -- Colin Walters <walters@debian.org>  Wed, 16 Oct 2002 11:05:09 -0400
+
+mini-dinstall (0.2.14) unstable; urgency=low
+
+  * Turn per-distribution options poll_time, max_retry_time, and
+    mail_on_success into integers.
+  * Print mode change in octal.
+
+ -- Colin Walters <walters@debian.org>  Tue, 15 Oct 2002 13:01:23 -0400
+
+mini-dinstall (0.2.13) unstable; urgency=low
+
+  * Fix algorithm for calculating old packages.  It was totally broken.
+    This should really fix #163449.
+  * Fix typo in exception handler for _install_run_scripts.
+  * Don't use ACCEPT directory; just put .changes in the toplevel
+    directory, but chmod them 600 to prevent other people from uploading
+    the packages.
+
+ -- Colin Walters <walters@debian.org>  Tue, 15 Oct 2002 11:51:25 -0400
+
+mini-dinstall (0.2.12) unstable; urgency=low
+
+  * Remove all older files with the same names as files in an upload, not
+    just ones with the same name as the source package (Closes: #163449).
+  * Fix flat mode; Sorry, joeyh!  I promise to test it in the future.
+  * Don't needlessly generate Packages/Sources files if the mtime on the
+    directory is older than the files.
+  * Use "foo in map.keys()" instead of just the much cooler "foo in map"
+    to be compatible with Python 2.1 (which is what's in woody).
+
+ -- Colin Walters <walters@debian.org>  Mon, 14 Oct 2002 01:48:04 -0400
+
+mini-dinstall (0.2.11) unstable; urgency=low
+
+  * Default to "simple-subdir" archive style again.  We do plan to default
+    to "flat" in version 0.3.0, but the change shouldn't have been made
+    yet.
+
+ -- Colin Walters <walters@debian.org>  Sun, 13 Oct 2002 09:57:08 -0400
+
+mini-dinstall (0.2.10) unstable; urgency=medium
+
+  * The "hopefully Roland won't mailbomb me again :)" release.
+  * Don't install packages in a separate thread; instead, install them
+    from the incoming thread (Closes: #164323).  It wasn't a useful
+    optimization, and caused bugs.  We do keep around the indexing
+    threads, however.
+  * Default to not use dnotify; it is unreliable (Closes: #164387).
+  * Add better error checking when running md5sum; I think along with the
+    above changes this will avoid crashing when verifying md5sum output
+    (Closes: #164297).
+  * Don't try to call strerror attribute when handling an error
+    (Closes: #162923).
+
+ -- Colin Walters <walters@debian.org>  Sun, 13 Oct 2002 00:49:23 -0400
+
+mini-dinstall (0.2.9) unstable; urgency=medium
+
+  * Try not to delete the .orig.tar.gz if we're making Debian-revision
+    only update (Closes: #159500).
+
+ -- Colin Walters <walters@debian.org>  Sun, 15 Sep 2002 20:42:54 -0400
+
+mini-dinstall (0.2.8) unstable; urgency=low
+
+  * Just depend on python-logging, not python2.1-logging.
+  * Don't crash when appending .changes to screwed list.
+
+ -- Colin Walters <walters@debian.org>  Sun,  1 Sep 2002 23:06:55 -0400
+
+mini-dinstall (0.2.7) unstable; urgency=low
+
+  * Test whether the Distribution: field exists before assuming a .changes
+    is ready.  Why it would fail to to exist is beyond me.  Hopefully this
+    will work around the bug until we find the root cause.
+  * Ensure .changes with an unknown Distribution get added to the screwed
+    list.
+
+ -- Colin Walters <walters@debian.org>  Sun,  1 Sep 2002 14:53:51 -0400
+
+mini-dinstall (0.2.6) unstable; urgency=low
+
+  * Test whether a process in the lockfile pid exists before locking
+    (Thanks Ivo Timmermans <ivo@o2w.nl> for the hint).
+  * Don't delay in killing an existing process.
+
+ -- Colin Walters <walters@debian.org>  Mon, 26 Aug 2002 20:01:45 -0400
+
+mini-dinstall (0.2.5) unstable; urgency=medium
+
+  * mini-dinstall:
+    Bugs reported by Ivo Timmermans <ivo@o2w.nl>.
+    - Allow --config= option to actually work.
+    - Don't lose when trying to access the mail_log_level option.
+    Other bugs:
+    - Don't wait on pending installations if IncomingDir is in daemon
+      mode.
+
+ -- Colin Walters <walters@debian.org>  Sun, 25 Aug 2002 14:41:45 -0400
+
+mini-dinstall (0.2.4) unstable; urgency=low
+
+  * First upload to Debian proper (Closes: #156582).
+  * Handle unknown distributions better.
+  * More error cleanups.
+
+ -- Colin Walters <walters@debian.org>  Tue, 20 Aug 2002 00:43:33 -0400
+
+mini-dinstall (0.2.3) staging; urgency=low
+
+  * Just Recommend: debian-keyring.
+
+ -- Colin Walters <walters@debian.org>  Tue, 20 Aug 2002 00:39:20 -0400
+
+mini-dinstall (0.2.2) staging; urgency=low
+
+  * Really make sure IncomingDir handles incomplete uploads.
+  * Fix bug in cleaning up flat mode archives.
+  * Depend: on debian-keyring.
+  * Clean up error handling a bit.
+  * Add ability to override keyrings.
+
+ -- Colin Walters <walters@debian.org>  Tue, 20 Aug 2002 00:11:18 -0400
+
+mini-dinstall (0.2.1) staging; urgency=low
+
+  * Try not to spam joeyh.
+  * Hopefully make rejection work better.
+
+ -- Colin Walters <walters@debian.org>  Mon, 19 Aug 2002 23:34:19 -0400
+
+mini-dinstall (0.2.0) staging; urgency=medium
+
+  * Support for verifying signatures on .changes; enabled by default!
+  * Fix race condition when installing multiple .changes at the same time.
+  * Don't try to parse archive_style as an int.
+  * Fix IncomingDir crashing bug on incomplete uploads.
+
+ -- Colin Walters <walters@debian.org>  Mon, 19 Aug 2002 22:04:09 -0400
+
+mini-dinstall (0.1.9) staging; urgency=low
+
+  * Allow for multiple archive styles; currently "simple-subdir" and
+    "flat"; this is the config opt "archive_style".
+
+ -- Colin Walters <walters@debian.org>  Mon, 19 Aug 2002 16:38:33 -0400
+
+mini-dinstall (0.1.1) staging; urgency=low
+
+  * Use relative filenames in Packages file.
+  * Don't install extra cruft in the doc dir.
+
+ -- Colin Walters <walters@debian.org>  Mon, 19 Aug 2002 15:24:53 -0400
+
+mini-dinstall (0.1.0) staging; urgency=low
+
+  * PRERELEASE
+  * Almost complete refactoring of the code.  Now there is a real
+    incoming/ directory.  This means that instead of uploading to one of
+    the distribution directories, you now just upload to
+    $ARCHIVEDIR/incoming, and put the distribution you want in the
+    debian/changelog.
+  * Support for mail_log_level = NONE
+  * Support for mailing you upon installation success. 
+  * First pass at a man page.
+
+ -- Colin Walters <walters@debian.org>  Mon, 19 Aug 2002 05:05:34 -0400
+
+mini-dinstall (0.0.3.2) unstable; urgency=low
+
+  * Hopefully support .udebs.
+
+ -- Colin Walters <walters@debian.org>  Mon, 19 Aug 2002 00:40:11 -0400
+
+mini-dinstall (0.0.3.1) unstable; urgency=low
+
+  * Add / to section regexp
+
+ -- Colin Walters <walters@debian.org>  Mon, 19 Aug 2002 00:30:18 -0400
+
+mini-dinstall (0.0.3.0) unstable; urgency=low
+
+  * Fix a regexp bug in ChangeFile.
+  * Support mailing successful installs.
+  * Support limiting the rate of mailing log entries.
+
+ -- Colin Walters <walters@debian.org>  Mon, 19 Aug 2002 00:24:50 -0400
+
+mini-dinstall (0.0.2.0) unstable; urgency=low
+
+  * Support pre-installation scripts, mailing on errors, and other fun
+    stuff.
+
+ -- Colin Walters <walters@debian.org>  Sun, 18 Aug 2002 22:34:23 -0400
+
+mini-dinstall (0.0.1.0) unstable; urgency=low
+
+  * Initial release (Closes: #156582).
+  
+ -- Colin Walters <walters@debian.org>  Tue, 13 Aug 2002 03:44:34 -0400
+
