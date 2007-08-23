@@ -19,7 +19,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os, sys, re, glob, getopt, time, traceback, gzip, getpass, socket
-import signal, threading, select, Queue, SocketServer
+import shutil, signal, threading, select, Queue, SocketServer
 import logging, logging.handlers
 #logging.basicConfig()
 import apt_pkg
@@ -1047,19 +1047,25 @@ class ArchiveDirIndexer(threading.Thread):
             os.exit(1)
         os.close(outfd)
         stdout = os.fdopen(infd)
-        packagesfile = open(os.path.join(dir, name), 'w')
-        zpackagesfile = gzip.GzipFile(os.path.join(dir, name + '.gz'), 'w')
+        packagesfilename = os.path.join(dir, name)
+        newpackagesfilename = packagesfilename + '.new'
+        zpackagesfilename = packagesfilename + '.gz'
+        newzpackagesfilename = newpackagesfilename + '.gz'
+        newpackagesfile = open(newpackagesfilename, 'w')
+        newzpackagesfile = gzip.GzipFile(newzpackagesfilename, 'w')
         buf = stdout.read(8192)
         while buf != '':
-            packagesfile.write(buf)
-            zpackagesfile.write(buf)
+            newpackagesfile.write(buf)
+            newzpackagesfile.write(buf)
             buf = stdout.read(8192)
         stdout.close()
         (pid, status) = os.waitpid(pid, 0)
         if not (status is None or (os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0)):
             raise DinstallException("apt-ftparchive exited with status code %d" % (status,))
-        packagesfile.close()
-        zpackagesfile.close()
+        newpackagesfile.close()
+        newzpackagesfile.close()
+        shutil.move(newpackagesfilename, packagesfilename)
+        shutil.move(newzpackagesfilename, zpackagesfilename)
 
     def _make_packagesfile(self, dir):
         self._make_indexfile(dir, 'packages', 'Packages')
