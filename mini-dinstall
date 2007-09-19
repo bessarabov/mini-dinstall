@@ -1073,79 +1073,11 @@ class ArchiveDirIndexer(threading.Thread):
     def _make_sourcesfile(self, dir):
         self._make_indexfile(dir, 'sources', 'Sources')
 
-    def _make_releasefile(self):
-        targetname = self._abspath('Release')
-        if not self._generate_release:
-            if os.access(targetname, os.R_OK):
-                self._logger.info("Release generation disabled, removing existing Release file")
-                try:
-                    os.unlink(targetname)
-                except OSError, e:
-                    pass
-            return
-        tmpname = targetname + tmp_new_suffix
-        release_needed = 0
-        uncompr_indexfiles = self._get_all_indexfiles()
-        indexfiles = []
-        comprexts = ['.gz']
-        for index in uncompr_indexfiles:
-            indexfiles = indexfiles + [index]
-            for ext in comprexts:
-                indexfiles = indexfiles + [index + ext]
-        if os.access(targetname, os.R_OK):
-            release_mtime = os.stat(targetname)[stat.ST_MTIME]
-            for file in indexfiles:
-                if release_needed:
-                    break
-            if os.stat(self._abspath(file))[stat.ST_MTIME] > release_mtime:
-                release_needed = 1
-        else:
-            release_needed = 1
-
-        if not release_needed:
-            self._logger.info("Skipping Release generation")
-            return
-        self._logger.info("Generating Release...")
-        if no_act:
-            self._logger.info("Release generation complete")
-            return
-        f = open(tmpname, 'w')
-        f.write('Origin: ' + self._release_origin + '\n')
-        f.write('Label: ' + self._release_label + '\n')
-        suite = self._release_suite
-        if not suite:
-            suite = self._name
-        f.write('Suite: ' + suite + '\n')
-        codename = self._release_codename
-        if not codename:
-            codename = suite
-        f.write('Codename: ' + codename + '\n')
-        f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
-        f.write('Architectures: ' + string.join(self._arches, ' ') + '\n')
-        if self._release_description:
-            f.write('Description: ' + self._release_description + '\n')
-        f.write('MD5Sum:\n')
-        for file in indexfiles:
-            absfile = self._abspath(file)
-            md5sum = self._get_file_sum('md5', absfile)
-            size = os.stat(absfile)[stat.ST_SIZE]
-            f.write(' %s% 16d %s\n' % (md5sum, size, file))
-        f.write('SHA1:\n')
-        for file in indexfiles:
-            absfile = self._abspath(file)
-            shasum = self._get_file_sum('sha1', absfile)
-            size = os.stat(absfile)[stat.ST_SIZE]
-            f.write(' %s% 16d %s\n' % (shasum, size, file))
-        f.close()
-        if self._sign_releasefile(tmpname):
-            os.rename(tmpname, targetname)
-            self._logger.info("Release generation complete")
-
-    def _sign_releasefile(self, name):
+    def _sign_releasefile(self, name, dir):
         if self._release_signscript:
             try:
                 self._logger.debug("Running Release signing script: " + self._release_signscript)
-                if self._run_script(name, self._release_signscript, dir=self._abspath()):
+                if self._run_script(name, self._release_signscript, dir=dir):
                     return None
             except:
                 self._logger.exception("failure while running Release signature script")
@@ -1222,12 +1154,15 @@ class ArchiveDirIndexer(threading.Thread):
     def _index_all(self, force=None):
         self._index(self._arches + ['source'], force)
 
+    def _gen_release_all(self, force=False):
+        self._gen_release(self._arches, force)
+
     def run(self):
         self._logger.info('Created new thread (%s) for archive indexer %s' % (self.getName(), self._name,))
         self._logger.info('Entering batch mode...')
         try:
             self._index_all(1)
-            self._make_releasefile()
+            self._gen_release_all(True)
             if not self._batch_mode:
                 # never returns
                 self._daemonize()
@@ -1286,10 +1221,11 @@ class ArchiveDirIndexer(threading.Thread):
             if dir is None:
                 self._logger.debug('Got general change')
                 self._index_all(1)
+                self._gen_release_all(True)
             else:
                 self._logger.debug('Got change in %s' % (dir,))
                 self._index([os.path.basename(os.path.abspath(dir))])
-            self._make_releasefile()
+                self._gen_release([os.path.basename(os.path.abspath(dir))])
             if setevent:
                 self._logger.debug('setting wait_reprocess event')
                 setevent.set()
@@ -1308,6 +1244,9 @@ class ArchiveDirIndexer(threading.Thread):
 
     def _index(self, arches, force=None):
         self._index_impl(arches, force=force)
+
+    def _gen_release(self, arches, force=False):
+        self._gen_release_impl(self._arches, force)
 
     def wait_reprocess(self):
         e = threading.Event()
@@ -1351,6 +1290,73 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
                 else:
                     self._logger.info('Skipping generation of Sources file for %s' % (arch,))
 
+    def _gen_release_impl(self, arches, force):
+        for arch in arches:
+            targetname = self._relpath(arch, 'Release')
+            if not self._generate_release:
+                if os.access(targetname, os.R_OK):
+                    self._logger.info("Release generation disabled, removing existing Release file")
+                    try:
+                        os.unlink(targetname)
+                    except OSError, e:
+                        pass
+                return
+            tmpname = targetname + tmp_new_suffix
+            release_needed = 0
+            uncompr_indexfile = os.path.join(arch, 'Packages')
+            indexfiles =  [uncompr_indexfile]
+            comprexts = ['.gz']
+            for ext in comprexts:
+                indexfiles = indexfiles + [uncompr_indexfile + ext]
+            if os.access(targetname, os.R_OK):
+                release_mtime = os.stat(targetname)[stat.ST_MTIME]
+                for file in indexfiles:
+                    if release_needed:
+                        break
+                if os.stat(self._abspath(file))[stat.ST_MTIME] > release_mtime:
+                    release_needed = 1
+            else:
+                release_needed = 1
+
+            if not release_needed:
+                self._logger.info("Skipping Release generation")
+                return
+            self._logger.info("Generating Release...")
+            if no_act:
+                self._logger.info("Release generation complete")
+                return
+            f = open(tmpname, 'w')
+            f.write('Origin: ' + self._release_origin + '\n')
+            f.write('Label: ' + self._release_label + '\n')
+            suite = self._release_suite
+            if not suite:
+                suite = self._name
+            f.write('Suite: ' + suite + '\n')
+            codename = self._release_codename
+            if not codename:
+                codename = suite
+            f.write('Codename: ' + '%s/%s\n' % (codename, arch))
+            f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
+            f.write('Architectures: ' + arch + '\n')
+            if self._release_description:
+                f.write('Description: ' + self._release_description + '\n')
+            f.write('MD5Sum:\n')
+            for file in indexfiles:
+                absfile = self._abspath(file)
+                md5sum = self._get_file_sum('md5', absfile)
+                size = os.stat(absfile)[stat.ST_SIZE]
+                f.write(' %s% 16d %s\n' % (md5sum, size, os.path.basename(absfile)))
+            f.write('SHA1:\n')
+            for file in indexfiles:
+                absfile = self._abspath(file)
+                shasum = self._get_file_sum('sha1', absfile)
+                size = os.stat(absfile)[stat.ST_SIZE]
+                f.write(' %s% 16d %s\n' % (shasum, size, os.path.basename(absfile)))
+            f.close()
+            if self._sign_releasefile(os.path.basename(tmpname), self._abspath(arch)):
+                os.rename(tmpname, targetname)
+                self._logger.info("Release generation complete")
+
     def _in_archdir(self, *args):
         return apply(lambda x,self=self: self._abspath(x), args)
 
@@ -1380,6 +1386,74 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
             self._logger.info('Sources generation complete')
         else:
             self._logger.info('Skipping generation of Sources file')
+
+    def _gen_release_impl(self, arches, force):
+        targetname = self._abspath('Release')
+        if not self._generate_release:
+            if os.access(targetname, os.R_OK):
+                self._logger.info("Release generation disabled, removing existing Release file")
+                try:
+                    os.unlink(targetname)
+                except OSError, e:
+                    pass
+            return
+        tmpname = targetname + tmp_new_suffix
+        release_needed = 0
+        uncompr_indexfiles = self._get_all_indexfiles()
+        indexfiles = []
+        comprexts = ['.gz']
+        for index in uncompr_indexfiles:
+            indexfiles = indexfiles + [index]
+            for ext in comprexts:
+                indexfiles = indexfiles + [index + ext]
+        if os.access(targetname, os.R_OK):
+            release_mtime = os.stat(targetname)[stat.ST_MTIME]
+            for file in indexfiles:
+                if release_needed:
+                    break
+            if os.stat(self._abspath(file))[stat.ST_MTIME] > release_mtime:
+                release_needed = 1
+        else:
+            release_needed = 1
+
+        if not release_needed:
+            self._logger.info("Skipping Release generation")
+            return
+        self._logger.info("Generating Release...")
+        if no_act:
+            self._logger.info("Release generation complete")
+            return
+        f = open(tmpname, 'w')
+        f.write('Origin: ' + self._release_origin + '\n')
+        f.write('Label: ' + self._release_label + '\n')
+        suite = self._release_suite
+        if not suite:
+            suite = self._name
+        f.write('Suite: ' + suite + '\n')
+        codename = self._release_codename
+        if not codename:
+            codename = suite
+        f.write('Codename: ' + codename + '\n')
+        f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
+        f.write('Architectures: ' + string.join(self._arches, ' ') + '\n')
+        if self._release_description:
+            f.write('Description: ' + self._release_description + '\n')
+        f.write('MD5Sum:\n')
+        for file in indexfiles:
+            absfile = self._abspath(file)
+            md5sum = self._get_file_sum('md5', absfile)
+            size = os.stat(absfile)[stat.ST_SIZE]
+            f.write(' %s% 16d %s\n' % (md5sum, size, file))
+        f.write('SHA1:\n')
+        for file in indexfiles:
+            absfile = self._abspath(file)
+            shasum = self._get_file_sum('sha1', absfile)
+            size = os.stat(absfile)[stat.ST_SIZE]
+            f.write(' %s% 16d %s\n' % (shasum, size, file))
+        f.close()
+        if self._sign_releasefile(tmpname, self._abspath()):
+            os.rename(tmpname, targetname)
+            self._logger.info("Release generation complete")
 
     def _in_archdir(self, *args):
         return apply(lambda x,self=self: self._abspath(x), args[1:])
