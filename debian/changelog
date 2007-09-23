@@ -1,3 +1,11 @@
+mini-dinstall (0.6.21-0.3) unstable; urgency=low
+
+  * UNRELEASED
+  * Create the release files in the correct subdirs with archive-style =
+    simple-subdir so it works with secure-apt (Closes: #343371)
+
+ -- Guido Guenther <agx@sigxcpu.org>  Sun, 23 Sep 2007 12:23:43 +0200
+
 mini-dinstall (0.6.21-0.2) unstable; urgency=low
 
   * NMU with maintainers approval
