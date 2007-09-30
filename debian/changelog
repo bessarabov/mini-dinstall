@@ -1,10 +1,18 @@
-mini-dinstall (0.6.21-0.3) unstable; urgency=low
+mini-dinstall (0.6.22) unstable; urgency=low
 
+  [ Guido Guenther ]
   * UNRELEASED
   * Create the release files in the correct subdirs with archive-style =
     simple-subdir so it works with secure-apt (Closes: #343371)
 
- -- Guido Guenther <agx@sigxcpu.org>  Sun, 23 Sep 2007 12:23:43 +0200
+  [ Christoph Goehre ]
+  * I'm the new Maintainer (Closes: #414621)
+  * build package with cdbs
+  * add XS-Vcs tags to git archive
+  * move python-dev and python-support to B-Depends (instead of B-D-I) to clam
+    lintian
+
+ -- Christoph Goehre <christoph.goehre@gmx.de>  Sun, 30 Sep 2007 17:51:10 +0200
 
 mini-dinstall (0.6.21-0.2) unstable; urgency=low
 

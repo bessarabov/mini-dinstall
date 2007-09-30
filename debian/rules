@@ -3,44 +3,15 @@
 # Sample debian/rules that uses debhelper. 
 # This file is public domain software, originally written by Joey Hess.
 
-build:
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
-lib/version.py: debian/changelog
-	echo "pkg_version = \"`dpkg-parsechangelog | awk '/^Version:/ { print $$2 }'`\"" > lib/version.py
+DEB_PYTHON_SYSTEM=pysupport
 
-clean: lib/version.py
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-	dh_clean
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/python-distutils.mk
 
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-	$(MAKE) install DESTDIR=debian/mini-dinstall
+update-version:
+	echo "pkg_version = \"$(DEB_UPSTREAM_VERSION)\"" > minidinstall/version.py
 
-# Build architecture-independent files here.
-binary-indep: build install
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs
-	dh_installdocs
-	dh_installexamples
-	dh_link
-	dh_compress
-	dh_fixperms
-	dh_pysupport
-	dh_python
-	dh_installdeb
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-# Build architecture-dependent files here.
-binary-arch: build install
-# We have nothing to do by default.
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: update-version
