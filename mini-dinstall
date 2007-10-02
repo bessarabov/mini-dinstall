@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import os, sys, re, glob, getopt, time, traceback, gzip, getpass, socket
+import os, sys, re, glob, getopt, time, traceback, gzip, bz2, getpass, socket
 import shutil, signal, threading, select, Queue, SocketServer
 import logging, logging.handlers
 #logging.basicConfig()
@@ -1050,13 +1050,17 @@ class ArchiveDirIndexer(threading.Thread):
         packagesfilename = os.path.join(dir, name)
         newpackagesfilename = packagesfilename + '.new'
         zpackagesfilename = packagesfilename + '.gz'
+        bz2packagesfilename = packagesfilename + '.bz2'
         newzpackagesfilename = newpackagesfilename + '.gz'
+        newbz2packagesfilename = newpackagesfilename + '.bz2'
         newpackagesfile = open(newpackagesfilename, 'w')
         newzpackagesfile = gzip.GzipFile(newzpackagesfilename, 'w')
+        newbz2packagesfile = bz2.BZ2File(newbz2packagesfilename, 'w')
         buf = stdout.read(8192)
         while buf != '':
             newpackagesfile.write(buf)
             newzpackagesfile.write(buf)
+            newbz2packagesfile.write(buf)
             buf = stdout.read(8192)
         stdout.close()
         (pid, status) = os.waitpid(pid, 0)
@@ -1064,8 +1068,10 @@ class ArchiveDirIndexer(threading.Thread):
             raise DinstallException("apt-ftparchive exited with status code %d" % (status,))
         newpackagesfile.close()
         newzpackagesfile.close()
+        newbz2packagesfile.close()
         shutil.move(newpackagesfilename, packagesfilename)
         shutil.move(newzpackagesfilename, zpackagesfilename)
+        shutil.move(newbz2packagesfilename, bz2packagesfilename)
 
     def _make_packagesfile(self, dir):
         self._make_indexfile(dir, 'packages', 'Packages')
@@ -1305,7 +1311,7 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
             release_needed = 0
             uncompr_indexfile = os.path.join(arch, 'Packages')
             indexfiles =  [uncompr_indexfile]
-            comprexts = ['.gz']
+            comprexts = ['.gz', '.bz2']
             for ext in comprexts:
                 indexfiles = indexfiles + [uncompr_indexfile + ext]
             if os.access(targetname, os.R_OK):
@@ -1401,7 +1407,7 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
         release_needed = 0
         uncompr_indexfiles = self._get_all_indexfiles()
         indexfiles = []
-        comprexts = ['.gz']
+        comprexts = ['.gz', '.bz2']
         for index in uncompr_indexfiles:
             indexfiles = indexfiles + [index]
             for ext in comprexts:
