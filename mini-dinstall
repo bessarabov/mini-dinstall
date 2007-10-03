@@ -206,7 +206,7 @@ if not (configp.has_option('DEFAULT', 'mail_log_level') and configp.get('DEFAULT
         mail_log_flush_count = configp.getint('DEFAULT', 'mail_log_flush_count')
     if configp.has_option('DEFAULT', 'mail_log_flush_level'):
         mail_log_flush_level = logging.__dict__[configp.get('DEFAULT', 'mail_log_flush_level')]
-    mail_smtp_handler = SubjectSpecifyingLoggingSMTPHandler('mini-dinstall log notice (%l)', mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.gethostname()), [mail_to])
+    mail_smtp_handler = SubjectSpecifyingLoggingSMTPHandler('mini-dinstall log notice (%l)', mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.getfqdn()), [mail_to])
     mail_handler = logging.handlers.MemoryHandler(mail_log_flush_count, flushLevel=mail_log_flush_level, target=mail_smtp_handler)
 
     mail_handler.setLevel(mail_log_level)
@@ -703,7 +703,7 @@ class ArchiveDir:
         if self._mail_on_success:
             self._success_logger = logging.Logger("mini-dinstall." + self._name)
             self._success_logger.setLevel(logging.DEBUG)
-            handler = SubjectSpecifyingLoggingSMTPHandler('mini-dinstall success notice', mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.gethostname()), [mail_to])
+            handler = SubjectSpecifyingLoggingSMTPHandler('mini-dinstall success notice', mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.getfqdn()), [mail_to])
             handler.setLevel(logging.DEBUG)
             self._success_logger.addHandler(handler)
         self._clean_targets = []
