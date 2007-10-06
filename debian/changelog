@@ -1,7 +1,6 @@
 mini-dinstall (0.6.22) unstable; urgency=low
 
   [ Guido Guenther ]
-  * UNRELEASED
   * Create the release files in the correct subdirs with archive-style =
     simple-subdir so it works with secure-apt (Closes: #343371)
 
@@ -11,8 +10,10 @@ mini-dinstall (0.6.22) unstable; urgency=low
   * add XS-Vcs tags to git archive
   * move python-dev and python-support to B-Depends (instead of B-D-I) to clam
     lintian
+  * add bz2 support for package files (Closes: #323925)
+  * use FQDN hostname for outgoing mail (Closes: #385314)
 
- -- Christoph Goehre <christoph.goehre@gmx.de>  Sun, 30 Sep 2007 17:51:10 +0200
+ -- Christoph Goehre <christoph.goehre@gmx.de>  Sat, 06 Oct 2007 12:07:44 +0200
 
 mini-dinstall (0.6.21-0.2) unstable; urgency=low
 
