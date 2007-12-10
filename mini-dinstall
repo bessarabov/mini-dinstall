@@ -31,7 +31,7 @@ from minidinstall.Dnotify import *
 from minidinstall.DebianSigVerifier import *
 from minidinstall.GPGSigVerifier import *
 from minidinstall.version import *
-from minidinstall import misc
+from minidinstall.misc import *
 
 debchanges_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.changes$')
 debpackage_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.u?deb$')
@@ -67,6 +67,14 @@ default_distributions = ("unstable",)
 
 distributions = {}
 scantime = 60
+
+mail_subject_template = "mini-dinstall: Successfully installed %(source)s %(version)s to %(distribution)s"
+mail_body_template = """Package: %(source)s
+Maintainer: %(maintainer)s
+Changed-By: %(changed-by)s
+Changes:
+%(changes_without_dot)s
+"""
 
 def usage(ecode, ver_only=None):
     print "mini-dinstall", pkg_version
@@ -186,9 +194,11 @@ logger.debug("Reading config files: %s" % (configfile_names,))
 configp.read(configfile_names)
 
 class SubjectSpecifyingLoggingSMTPHandler(logging.handlers.SMTPHandler):
-    def __init__(self, subject, *args, **kwargs):
-        self._subject = subject
+    def __init__(self, *args, **kwargs):
         apply(logging.handlers.SMTPHandler.__init__, [self] + list(args) + ['dummy'], kwargs)
+
+    def setSubject(self, subject):
+        self._subject = subject
 
     def getSubject(self, record):
         return re.sub('%l', record.levelname, self._subject)
@@ -206,7 +216,8 @@ if not (configp.has_option('DEFAULT', 'mail_log_level') and configp.get('DEFAULT
         mail_log_flush_count = configp.getint('DEFAULT', 'mail_log_flush_count')
     if configp.has_option('DEFAULT', 'mail_log_flush_level'):
         mail_log_flush_level = logging.__dict__[configp.get('DEFAULT', 'mail_log_flush_level')]
-    mail_smtp_handler = SubjectSpecifyingLoggingSMTPHandler('mini-dinstall log notice (%l)', mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.getfqdn()), [mail_to])
+    mail_smtp_handler = SubjectSpecifyingLoggingSMTPHandler(mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.getfqdn()), [mail_to])
+    mail_smtp_handler.setSubject('mini-dinstall log notice (%l)')
     mail_handler = logging.handlers.MemoryHandler(mail_log_flush_count, flushLevel=mail_log_flush_level, target=mail_smtp_handler)
 
     mail_handler.setLevel(mail_log_level)
@@ -313,6 +324,10 @@ if configp.has_option('DEFAULT', 'keyrings'):
     default_keyrings = re.split(', ?', configp.get('DEFAULT', 'keyrings'))
 if configp.has_option('DEFAULT', 'use_dnotify'):
     use_dnotify = configp.getboolean('DEFAULT', 'use_dnotify')
+if configp.has_option('DEFAULT', 'mail_subject_template'):
+    mail_subject_template = configp.get('DEFAULT', 'mail_subject_template', 1)
+if configp.has_option('DEFAULT', 'mail_body_template'):
+    mail_body_template = configp.get('DEFAULT', 'mail_body_template', 1)
 
 sects = configp.sections()
 if not len(sects) == 0:
@@ -703,9 +718,9 @@ class ArchiveDir:
         if self._mail_on_success:
             self._success_logger = logging.Logger("mini-dinstall." + self._name)
             self._success_logger.setLevel(logging.DEBUG)
-            handler = SubjectSpecifyingLoggingSMTPHandler('mini-dinstall success notice', mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.getfqdn()), [mail_to])
-            handler.setLevel(logging.DEBUG)
-            self._success_logger.addHandler(handler)
+            self.mailHandler = SubjectSpecifyingLoggingSMTPHandler(mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.getfqdn()), [mail_to])
+            self.mailHandler.setLevel(logging.DEBUG)
+            self._success_logger.addHandler(self.mailHandler)
         self._clean_targets = []
 
 #         self._filerefmap = {}
@@ -772,7 +787,9 @@ class ArchiveDir:
         do_rename(changefilename, target)
         self._logger.info('Successfully installed %s %s to %s' % (sourcename, version, self._name))
         if self._mail_on_success:
-            self._success_logger.info('Successfully installed %s %s to %s' % (sourcename, version, self._name))
+            changefile ['changes_without_dot'] = format_changes(changefile['changes'])
+            self.mailHandler.setSubject(mail_subject_template % changefile)
+            self._success_logger.info(mail_body_template % changefile)
         
         if self._post_install_script:
             try:

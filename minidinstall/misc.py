@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import os, errno, time
+import os, errno, time, string, re
 
 def dup2(fd,fd2):
   # dup2 with EBUSY retries (cf. dup2(2) and Debian bug #265513)
@@ -34,3 +34,14 @@ def dup2(fd,fd2):
       # wait 0-2 seconds befor next try
       time.sleep(tries)
       tries += 1
+
+def format_changes(L):
+    """ remove changelog header and all lines with only a dot """
+
+    dotmatch = re.compile('^\.$')
+    L1 = []
+
+    for x in L[3:]:
+        L1.append(dotmatch.sub('', x))
+
+    return "\n".join(L1)
