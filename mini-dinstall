@@ -1171,6 +1171,15 @@ class ArchiveDirIndexer(threading.Thread):
                 shasum.update(buf)
                 buf = f.read(8192)
             return shasum.hexdigest()
+        elif type == 'sha256':
+            import Crypto.Hash.SHA256
+            f = open(filename)
+            buf = f.read(8192)
+            shasum256 = SHA256.new(buf)
+            while buf != '':
+                shasum256.hash_update(buf)
+                buf = f.read(8192)
+            return shasum256.hash_digest()
         else:
             raise DinstallException('cannot compute hash of type %s; no builtin method or /usr/bin/%ssum', type, type)
 
@@ -1375,6 +1384,12 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
                 shasum = self._get_file_sum('sha1', absfile)
                 size = os.stat(absfile)[stat.ST_SIZE]
                 f.write(' %s% 16d %s\n' % (shasum, size, os.path.basename(absfile)))
+            f.write('SHA256:\n')
+            for file in indexfiles:
+                absfile = self._abspath(file)
+                shasum256 = self._get_file_sum('sha256', absfile)
+                size = os.stat(absfile)[stat.ST_SIZE]
+                f.write(' %s% 16d %s\n' % (shasum256, size, os.path.basename(absfile)))
             f.close()
             if self._sign_releasefile(os.path.basename(tmpname), self._abspath(arch)):
                 os.rename(tmpname, targetname)
@@ -1473,6 +1488,12 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
             shasum = self._get_file_sum('sha1', absfile)
             size = os.stat(absfile)[stat.ST_SIZE]
             f.write(' %s% 16d %s\n' % (shasum, size, file))
+        f.write('SHA256:\n')
+        for file in indexfiles:
+            absfile = self._abspath(file)
+            shasum256 = self._get_file_sum('sha256', absfile)
+            size = os.stat(absfile)[stat.ST_SIZE]
+            f.write(' %s% 16d %s\n' % (shasum256, size, file))
         f.close()
         if self._sign_releasefile(tmpname, self._abspath()):
             os.rename(tmpname, targetname)

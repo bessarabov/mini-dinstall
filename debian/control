@@ -10,7 +10,7 @@ XS-Vcs-Browser: http://git.debian.org/?p=mini-dinstall/mini-dinstall.git
 
 Package: mini-dinstall
 Architecture: all
-Depends: ${python:Depends}, python-apt, apt-utils
+Depends: ${python:Depends}, python-apt, apt-utils, python-crypto
 Suggests: debian-keyring
 Description: daemon for updating Debian packages in a repository
  This program implements a miniature version of the "dinstall" program
