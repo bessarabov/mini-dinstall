@@ -1183,6 +1183,21 @@ class ArchiveDirIndexer(threading.Thread):
         else:
             raise DinstallException('cannot compute hash of type %s; no builtin method or /usr/bin/%ssum', type, type)
 
+    def _do_hash(self, hash, indexfiles, f):
+        """
+        write hash digest into filehandle
+
+        @param hash: used hash algorithm
+        @param indexfiles: system architectures
+        @param f: file handle
+        """
+        f.write("%s%s:\n" % (hash.upper(), ['', 'Sum'][hash == 'md5']))
+        for file in indexfiles:
+            absfile = self._abspath(file)
+            h = self._get_file_sum(hash, absfile)
+            size = os.stat(absfile)[stat.ST_SIZE]
+            f.write(' %s% 16d %s\n' % (h, size, os.path.basename(absfile)))
+
     def _index_all(self, force=None):
         self._index(self._arches + ['source'], force)
 
@@ -1372,24 +1387,8 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
             f.write('Architectures: ' + arch + '\n')
             if self._release_description:
                 f.write('Description: ' + self._release_description + '\n')
-            f.write('MD5Sum:\n')
-            for file in indexfiles:
-                absfile = self._abspath(file)
-                md5sum = self._get_file_sum('md5', absfile)
-                size = os.stat(absfile)[stat.ST_SIZE]
-                f.write(' %s% 16d %s\n' % (md5sum, size, os.path.basename(absfile)))
-            f.write('SHA1:\n')
-            for file in indexfiles:
-                absfile = self._abspath(file)
-                shasum = self._get_file_sum('sha1', absfile)
-                size = os.stat(absfile)[stat.ST_SIZE]
-                f.write(' %s% 16d %s\n' % (shasum, size, os.path.basename(absfile)))
-            f.write('SHA256:\n')
-            for file in indexfiles:
-                absfile = self._abspath(file)
-                shasum256 = self._get_file_sum('sha256', absfile)
-                size = os.stat(absfile)[stat.ST_SIZE]
-                f.write(' %s% 16d %s\n' % (shasum256, size, os.path.basename(absfile)))
+            for hash in [ 'md5', 'sha1', 'sha256' ]:
+                    self._do_hash(hash, indexfiles, f)
             f.close()
             if self._sign_releasefile(os.path.basename(tmpname), self._abspath(arch)):
                 os.rename(tmpname, targetname)
@@ -1476,24 +1475,8 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
         f.write('Architectures: ' + string.join(self._arches, ' ') + '\n')
         if self._release_description:
             f.write('Description: ' + self._release_description + '\n')
-        f.write('MD5Sum:\n')
-        for file in indexfiles:
-            absfile = self._abspath(file)
-            md5sum = self._get_file_sum('md5', absfile)
-            size = os.stat(absfile)[stat.ST_SIZE]
-            f.write(' %s% 16d %s\n' % (md5sum, size, file))
-        f.write('SHA1:\n')
-        for file in indexfiles:
-            absfile = self._abspath(file)
-            shasum = self._get_file_sum('sha1', absfile)
-            size = os.stat(absfile)[stat.ST_SIZE]
-            f.write(' %s% 16d %s\n' % (shasum, size, file))
-        f.write('SHA256:\n')
-        for file in indexfiles:
-            absfile = self._abspath(file)
-            shasum256 = self._get_file_sum('sha256', absfile)
-            size = os.stat(absfile)[stat.ST_SIZE]
-            f.write(' %s% 16d %s\n' % (shasum256, size, file))
+        for hash in [ 'md5', 'sha1', 'sha256' ]:
+            self._do_hash(hash, indexfiles, f)
         f.close()
         if self._sign_releasefile(tmpname, self._abspath()):
             os.rename(tmpname, targetname)
