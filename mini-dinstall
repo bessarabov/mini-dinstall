@@ -1143,7 +1143,12 @@ class ArchiveDirIndexer(threading.Thread):
                 raise DinstallException("%ssum returned error output \"%s\"" % (type, erroutput,))
             (sum, filename) = string.split(child.fromchild.read(), None, 1)
             child.fromchild.close()
-            status = child.wait()
+            try:
+                status = child.wait()
+            except OSError, (errno, strerror):
+                if errno == errno.ECHILD:
+                    status = None
+                self._logger.info("OSError(%d): %s" % (errno, strerror))
             if not (status is None or (os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0)):
                 if os.WIFEXITED(status):
                     msg = "%ssum exited with error code %d" % (type, os.WEXITSTATUS(status),)
