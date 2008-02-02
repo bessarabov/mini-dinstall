@@ -31,7 +31,7 @@ from minidinstall.Dnotify import *
 from minidinstall.DebianSigVerifier import *
 from minidinstall.GPGSigVerifier import *
 from minidinstall.version import *
-from minidinstall.misc import *
+import minidinstall.misc
 
 debchanges_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.changes$')
 debpackage_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.u?deb$')
@@ -787,7 +787,7 @@ class ArchiveDir:
         do_rename(changefilename, target)
         self._logger.info('Successfully installed %s %s to %s' % (sourcename, version, self._name))
         if self._mail_on_success:
-            changefile ['changes_without_dot'] = format_changes(changefile['changes'])
+            changefile ['changes_without_dot'] = misc.format_changes(changefile['changes'])
             self.mailHandler.setSubject(mail_subject_template % changefile)
             self._success_logger.info(mail_body_template % changefile)
         
