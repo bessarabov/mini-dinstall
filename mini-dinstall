@@ -1129,62 +1129,10 @@ class ArchiveDirIndexer(threading.Thread):
                     return 1
         return 0
 
-    # Hacked up from ChangeFile.py; FIXME: merge the two
     def _get_file_sum(self, type, filename):
-        if os.access('/usr/bin/%ssum' % (type,), os.X_OK):
-            cmd = '/usr/bin/%ssum %s' % (type, filename,)
-            self._logger.debug("Running: %s" % (cmd,))
-            child = popen2.Popen3(cmd, 1)
-            child.tochild.close()
-            erroutput = child.childerr.read()
-            child.childerr.close()
-            if erroutput != '':
-                child.fromchild.close()
-                raise DinstallException("%ssum returned error output \"%s\"" % (type, erroutput,))
-            (sum, filename) = string.split(child.fromchild.read(), None, 1)
-            child.fromchild.close()
-            try:
-                status = child.wait()
-            except OSError, (errno, strerror):
-                if errno == errno.ECHILD:
-                    status = None
-                self._logger.info("OSError(%d): %s" % (errno, strerror))
-            if not (status is None or (os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0)):
-                if os.WIFEXITED(status):
-                    msg = "%ssum exited with error code %d" % (type, os.WEXITSTATUS(status),)
-                elif os.WIFSTOPPED(status):
-                    msg = "%ssum stopped unexpectedly with signal %d" % (type, os.WSTOPSIG(status),)
-                elif os.WIFSIGNALED(status):
-                    msg = "%ssum died with signal %d" % (type, os.WTERMSIG(status),)
-                raise DinstallException(msg)
-            return sum.strip()
-        if type == 'md5':
-            import md5
-            f = open(filename)
-            md5sum = md5.new()
-            buf = f.read(8192)
-            while buf != '':
-                md5sum.update(buf)
-                buf = f.read(8192)
-            return md5sum.hexdigest()
-        elif type == 'sha1':
-            import sha
-            f = open(filename)
-            shasum = sha.new()
-            buf = f.read(8192)
-            while buf != '':
-                shasum.update(buf)
-                buf = f.read(8192)
-            return shasum.hexdigest()
-        elif type == 'sha256':
-            from Crypto.Hash import SHA256
-            f = open(filename)
-            buf = f.read(8192)
-            shasum256 = SHA256.new()
-            while buf != '':
-                shasum256.update(buf)
-                buf = f.read(8192)
-            return shasum256.hexdigest()
+        ret = misc.get_file_sum(self, type, filename)
+        if ret:
+            return ret
         else:
             raise DinstallException('cannot compute hash of type %s; no builtin method or /usr/bin/%ssum', type, type)
 

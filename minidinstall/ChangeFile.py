@@ -18,10 +18,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import os, re, sys, string, stat, popen2
+import os, re, sys, string, stat
 import threading, Queue
 import logging
 from minidinstall import DpkgControl, SignedFile
+from minidinstall import misc
 
 class ChangeFileException(Exception):
     def __init__(self, value):
@@ -70,40 +71,8 @@ class ChangeFile(DpkgControl.DpkgParagraph):
             raise ChangeFileException("Can't stat %s: %s" % (filename,e.strerror))
         if size != expected_size:
             raise ChangeFileException("File size for %s does not match that specified in .dsc" % (filename,))
-        if (self._get_file_md5sum(filename) != expected_md5sum):
+        if (misc.get_file_sum(self, 'md5', filename) != expected_md5sum):
             raise ChangeFileException("md5sum for %s does not match that specified in .dsc" % (filename,))
         self._logger.debug('Verified md5sum %s and size %s for %s' % (expected_md5sum, expected_size, filename))
-
-    def _get_file_md5sum(self, filename):
-        if os.access('/usr/bin/md5sum', os.X_OK):
-            cmd = '/usr/bin/md5sum %s' % (filename,)
-            self._logger.debug("Running: %s" % (cmd,))
-            child = popen2.Popen3(cmd, 1)
-            child.tochild.close()
-            erroutput = child.childerr.read()
-            child.childerr.close()
-            if erroutput != '':
-                child.fromchild.close()
-                raise ChangeFileException("md5sum returned error output \"%s\"" % (erroutput,))
-            (md5sum, filename) = string.split(child.fromchild.read(), None, 1)
-            child.fromchild.close()
-            status = child.wait()
-            if not (status is None or (os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0)):
-                if os.WIFEXITED(status):
-                    msg = "md5sum exited with error code %d" % (os.WEXITSTATUS(status),)
-                elif os.WIFSTOPPED(status):
-                    msg = "md5sum stopped unexpectedly with signal %d" % (os.WSTOPSIG(status),)
-                elif os.WIFSIGNALED(status):
-                    msg = "md5sum died with signal %d" % (os.WTERMSIG(status),)
-                raise ChangeFileException(msg)
-            return md5sum.strip()
-        import md5
-        f = open(filename)
-        md5sum = md5.new()
-        buf = f.read(8192)
-        while buf != '':
-            md5sum.update(buf)
-            buf = f.read(8192)
-        return md5sum.hexdigest()
 
 # vim:ts=4:sw=4:et:
