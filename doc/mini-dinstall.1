@@ -148,6 +148,32 @@ to \fBERROR\fR.
 .B mail_to
 The user to whom logs should be mailed. Defaults to the current user.
 .TP
+.B mail_subject_template
+Style of the email subject. Available substitution variables are \fBsource\fR,
+\fBversion\fR, \fBmaintainer\fR, ... (all statements in .changes) and
+\fBchanges_without_dot\fR (same as \fBchanges\fR, but without lines with only a dot).
+Default is:
+.RS
+.PP
+ mini-dinstall: Successfully installed %(source)s %(version)s to %(distribution)s
+.RE
+.FI
+.RE
+.TP
+.B mail_body_template
+Style of the email body. Valid values are the same as for the
+\fBmail_subject_template\fR option. Default is:
+.RS
+.PP
+ Package: %(source)s
+ Maintainer: %(maintainer)s
+ Changed-By: %(changed-by)s
+ Changes:
+ %(changes_without_dot)s
+.RE
+.FI
+.RE
+.TP
 .B trigger_reindex
 In daemon mode, whether or not to recreate the Packages and Sources files after
 every upload. If you disable this, you probably want to enable
