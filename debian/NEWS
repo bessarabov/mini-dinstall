@@ -1,0 +1,6 @@
+mini-dinstall (0.6.23) unstable; urgency=low
+
+  Mini-dinstall have 2 new config options for success email.
+  To edit both, take a look into mini-dinstall's man page.
+
+ -- Christoph Goehre <christoph.goehre@gmx.de>  Sun, 03 Feb 2008 10:36:47 +0100

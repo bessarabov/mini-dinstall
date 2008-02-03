@@ -4,9 +4,9 @@ Section: devel
 Maintainer: Christoph Goehre <christoph.goehre@gmx.de>
 Uploaders: Guido Guenther <agx@sigxcpu.org>
 Build-Depends: cdbs, debhelper (>= 4.1.25), python-dev, python-support (>= 0.3)
-Standards-Version: 3.7.2
-XS-Vcs-Git: git://git.debian.org/git/mini-dinstall/mini-dinstall.git
-XS-Vcs-Browser: http://git.debian.org/?p=mini-dinstall/mini-dinstall.git
+Standards-Version: 3.7.3
+Vcs-Git: git://git.debian.org/git/mini-dinstall/mini-dinstall.git
+Vcs-Browser: http://git.debian.org/?p=mini-dinstall/mini-dinstall.git
 
 Package: mini-dinstall
 Architecture: all

@@ -1,3 +1,16 @@
+mini-dinstall (0.6.23) unstable; urgency=low
+
+  * use templates to generate success email (Closes: #451949)
+  * add SHA256 hashes in release files (Closes: #453032)
+  * don't fail on missing child processes in external hash generation
+  * merge identically hash generation for release file in mini-dinstall and
+    ChangeFile.py into misc.py
+  * change XS-Vcs tags to Vcs
+  * change Standard-Version to 3.7.3 and national encoding of copyright to
+    UTF-8
+
+ -- Christoph Goehre <christoph.goehre@gmx.de>  Sun, 03 Feb 2008 10:53:25 +0100
+
 mini-dinstall (0.6.22) unstable; urgency=low
 
   [ Guido Guenther ]
