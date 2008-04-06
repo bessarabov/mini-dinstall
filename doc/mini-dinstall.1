@@ -154,16 +154,18 @@ Style of the email subject. Available substitution variables are \fBsource\fR,
 \fBchanges_without_dot\fR (same as \fBchanges\fR, but without lines with only a dot).
 Default is:
 .RS
+.nf
 .PP
  mini-dinstall: Successfully installed %(source)s %(version)s to %(distribution)s
 .RE
-.FI
+.fi
 .RE
 .TP
 .B mail_body_template
 Style of the email body. Valid values are the same as for the
 \fBmail_subject_template\fR option. Default is:
 .RS
+.nf
 .PP
  Package: %(source)s
  Maintainer: %(maintainer)s
@@ -171,7 +173,7 @@ Style of the email body. Valid values are the same as for the
  Changes:
  %(changes_without_dot)s
 .RE
-.FI
+.fi
 .RE
 .TP
 .B trigger_reindex
@@ -204,24 +206,24 @@ splits up the binary packages by architecture. Must be set.
 .PP
 Sources for the \(lqflat\(rq style should look like:
 .PP
-.NF
+.nf
 .RS
  deb file:///home/walters/debian/ unstable/
  deb-src file:///home/walters/debian/ unstable/
  deb file:///home/walters/debian/ experimental/
  deb-src file:///home/walters/debian/ experimental/
 .RE
-.FI
+.fi
 .PP
 Sources for the \(lqsubdir\(rq style should look like:
 .PP
-.NF
+.nf
 .RS
  deb http://localhost/~walters/debian/ local/$(ARCH)/
  deb http://localhost/~walters/debian/ local/all/
  deb-src http://localhost/~walters/debian/ local/source/
 .RE
-.FI
+.fi
 .RE
 .TP
 .B chown_changes_files
@@ -290,7 +292,7 @@ packages by using \fBdput\fR to upload them to a local repository, and then
 uses APT's \(lqfile\(rq method to retrieve them locally. Here's a sample
 \fBdput\fR stanza:
 .PP
-.NF
+.nf
 .RS
  [local]
  fqdn = space\-ghost.verbum.private
@@ -299,7 +301,7 @@ uses APT's \(lqfile\(rq method to retrieve them locally. Here's a sample
  run_dinstall = 0
  post_upload_command = mini\-dinstall \-r
 .RE
-.FI
+.fi
 .PP
 Obviously, you should replace the \(lqfqdn\(rq and \(lqincoming\(rq values with
 whatever is appropriate for your machine.  Some sample APT methods were listed
@@ -307,7 +309,7 @@ in the configuration section.
 .PP
 Now, all you have to do to test your Debian packages is:
 .PP
-.NF
+.nf
 .RS
  $ dpkg-buildpackage
  $ dput local ../program_1.2.3\-1_powerpc.changes
@@ -315,7 +317,7 @@ Now, all you have to do to test your Debian packages is:
  $ apt\-get update
  $ apt\-get install program
 .RE
-.FI
+.fi
 .\"
 .SH AUTHOR
 .B mini\-dinstall
