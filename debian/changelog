@@ -1,3 +1,10 @@
+mini-dinstall (0.6.24) unstable; urgency=low
+
+  * correct manpage formatting
+  * fix crash in hash generation for Release file
+
+ -- Christoph Goehre <christoph.goehre@gmx.de>  Sun, 06 Apr 2008 18:46:31 +0200
+
 mini-dinstall (0.6.23) unstable; urgency=low
 
   * use templates to generate success email (Closes: #451949)
