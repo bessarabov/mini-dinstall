@@ -90,7 +90,7 @@ def _get_external_file_sum(self, type, filename):
             status = child.wait()
         except OSError, (errnum, err):
             if errnum == 10:
-                logger.warn("Ignoring missing child proccess")
+                self._logger.warn("Ignoring missing child proccess")
                 status = 0
         if not (status is None or (os.WIFEXITED(status) and os.WEXITSTATUS(status) == 0)):
             if os.WIFEXITED(status):
