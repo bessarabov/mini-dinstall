@@ -362,6 +362,7 @@ class DistOptionHandler:
         self._optionmap['release_label'] = ['str', self._optionmap['release_origin'][1]]
         self._optionmap['release_suite'] = ['str', None]
         self._optionmap['release_codename'] = ['str', None]
+        self._optionmap['experimental_release'] = ['bool', 0]
         self._optionmap['release_description'] = ['str', None]
         self._optionmap['release_signscript'] = ['str', None]
 
@@ -1336,6 +1337,8 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
             if not codename:
                 codename = suite
             f.write('Codename: ' + '%s/%s\n' % (codename, arch))
+            if self._experimental_release:
+                f.write('NotAutomatic: yes\n')
             f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
             f.write('Architectures: ' + arch + '\n')
             if self._release_description:
@@ -1424,6 +1427,8 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
         if not codename:
             codename = suite
         f.write('Codename: ' + codename + '\n')
+        if self._experimental_release:
+            f.write('NotAutomatic: yes\n')
         f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
         f.write('Architectures: ' + string.join(self._arches, ' ') + '\n')
         if self._release_description:
