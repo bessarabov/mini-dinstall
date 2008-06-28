@@ -1050,7 +1050,7 @@ class ArchiveDirIndexer(threading.Thread):
         return apply(os.path.join, [self._name] + list(args))
 
     def _make_indexfile(self, dir, type, name):
-        cmdline = ['apt-ftparchive', type, dir]
+        cmdline = ['apt-ftparchive', type, dir, '--db', '%s.db' %dir]
         self._logger.debug("Running: " + string.join(cmdline, ' '))
         if no_act:
             return
