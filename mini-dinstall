@@ -812,7 +812,7 @@ class ArchiveDir:
         else:
             (newupstreamver, newdebianver) = parse_versions(version)
         is_sourceful = 0
-        for file in map(lambda x: x[4], changefile.getFiles()):
+        for file in map(lambda x: x[2], changefile.getFiles()):
             match = debpackage_re.search(file)
             if match:
                 arch = match.group(3)
@@ -959,7 +959,7 @@ class ArchiveDir:
             else:
                 traceback.print_exception(Exception, exception, None, None, f)
             f.close()
-            for file in map(lambda x: x[4], changefile.getFiles()):
+            for file in map(lambda x: x[2], changefile.getFiles()):
                 if os.access(os.path.join(incomingdir, file), os.R_OK):
                     file = os.path.join(incomingdir, file)
                 else:

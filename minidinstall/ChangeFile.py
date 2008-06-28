@@ -31,6 +31,10 @@ class ChangeFileException(Exception):
         return `self._value`
         
 class ChangeFile(DpkgControl.DpkgParagraph):
+    md5_re = r'^(?P<md5>[0-9a-f]{32})[ \t]+(?P<size>\d+)[ \t]+(?P<section>[-/a-zA-Z0-9]+)[ \t]+(?P<priority>[-a-zA-Z0-9]+)[ \t]+(?P<file>[0-9a-zA-Z][-+:.,=~0-9a-zA-Z_]+)$'
+    sha1_re = r'^(?P<sha1>[0-9a-f]{40})[ \t]+(?P<size>\d+)[ \t]+(?P<file>[0-9a-zA-Z][-+:.,=~0-9a-zA-Z_]+)$'
+    sha256_re = r'^(?P<sha256>[0-9a-f]{64})[ \t]+(?P<size>\d+)[ \t]+(?P<file>[0-9a-zA-Z][-+:.,=~0-9a-zA-Z_]+)$'
+
     def __init__(self): 
         DpkgControl.DpkgParagraph.__init__(self)
         self._logger = logging.getLogger("mini-dinstall")
@@ -41,26 +45,50 @@ class ChangeFile(DpkgControl.DpkgParagraph):
         f.close()
 
     def getFiles(self):
-        out = []
+        return self._get_checksum_from_changes()['md5']
+
+    def _get_checksum_from_changes(self):
+        """ extract checksums and size from changes file """
+        output = {}
+        hashes = { 'md5': ['files', re.compile(self.md5_re)],
+                   'sha1': ['checksums-sha1', re.compile(self.sha1_re)],
+                   'sha256': ['checksums-sha256', re.compile(self.sha256_re)]
+                 }
+        hashes_checked = hashes.copy()
+
         try:
-            files = self['files']
+            self['files']
         except KeyError:
             return []
-        lineregexp = re.compile("^([0-9a-f]{32})[ \t]+(\d+)[ \t]+([-/a-zA-Z0-9]+)[ \t]+([-a-zA-Z0-9]+)[ \t]+([0-9a-zA-Z][-+:.,=~0-9a-zA-Z_]+)$")
-        for line in files:
-            if line == '':
-                continue
-            match = lineregexp.match(line)
-            if (match is None):
-                raise ChangeFileException("Couldn't parse file entry \"%s\" in Files field of .changes" % (line,))
-            out.append((match.group(1), match.group(2), match.group(3), match.group(4), match.group(5)))
-        return out
+
+        for hash in hashes:
+            try:
+                self[hashes[hash][0]]
+            except KeyError:
+                self._logger.warn("Can't find %s checksums in changes file" % hash)
+                hashes_checked.pop(hash)
+
+        for hash in hashes_checked:
+            output[hash] = []
+            for line in self[hashes[hash][0]]:
+                if line == '':
+                    continue
+                match = hashes[hash][1].match(line)
+                if (match is None):
+                    raise ChangeFileException("Couldn't parse file entry \"%s\" in Files field of .changes" % (line,))
+                output[hash].append([match.group(hash), match.group('size'), match.group('file') ])
+        return output
         
     def verify(self, sourcedir):
-        for (md5sum, size, section, prioriy, filename) in self.getFiles():
-            self._verify_file_integrity(os.path.join(sourcedir, filename), int(size), md5sum)
+        """ verify size and hash values from changes file """
+        checksum = self._get_checksum_from_changes()
+        for hash in checksum.keys():
+            for (hashsum, size, filename) in checksum[hash]:
+                self._verify_file_integrity(os.path.join(sourcedir, filename), int(size), hash, hashsum)
+
             
-    def _verify_file_integrity(self, filename, expected_size, expected_md5sum):
+    def _verify_file_integrity(self, filename, expected_size, hash, expected_hashsum):
+        """ check uploaded file integrity """
         self._logger.debug('Checking integrity of %s' % (filename,))
         try:
             statbuf = os.stat(filename)
@@ -71,8 +99,8 @@ class ChangeFile(DpkgControl.DpkgParagraph):
             raise ChangeFileException("Can't stat %s: %s" % (filename,e.strerror))
         if size != expected_size:
             raise ChangeFileException("File size for %s does not match that specified in .dsc" % (filename,))
-        if (misc.get_file_sum(self, 'md5', filename) != expected_md5sum):
-            raise ChangeFileException("md5sum for %s does not match that specified in .dsc" % (filename,))
-        self._logger.debug('Verified md5sum %s and size %s for %s' % (expected_md5sum, expected_size, filename))
+        if (misc.get_file_sum(self, hash, filename) != expected_hashsum):
+            raise ChangeFileException("%ssum for %s does not match that specified in .dsc" % (hash, filename,))
+        self._logger.debug('Verified %ssum %s and size %s for %s' % (hash, expected_hashsum, expected_size, filename))
 
 # vim:ts=4:sw=4:et:
