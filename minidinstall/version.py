@@ -1,1 +1,1 @@
-pkg_version = "0.6.24"
+pkg_version = "0.6.25"
