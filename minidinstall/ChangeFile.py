@@ -38,9 +38,11 @@ class ChangeFile(DpkgControl.DpkgParagraph):
     def __init__(self):
         DpkgControl.DpkgParagraph.__init__(self)
         self._logger = logging.getLogger("mini-dinstall")
+        self._file = ''
 
     def load_from_file(self, filename):
-        f = SignedFile.SignedFile(open(filename))
+        self._file = filename
+        f = SignedFile.SignedFile(open(self._file))
         self.load(f)
         f.close()
 
@@ -65,7 +67,7 @@ class ChangeFile(DpkgControl.DpkgParagraph):
             try:
                 self[hashes[hash][0]]
             except KeyError:
-                self._logger.warn("Can't find %s checksums in changes file" % hash)
+                self._logger.warn("Can't find %s checksums in changes file '%s'" % (hash, os.path.basename(self._file)))
                 hashes_checked.pop(hash)
 
         for hash in hashes_checked:
