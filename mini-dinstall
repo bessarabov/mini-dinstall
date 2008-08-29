@@ -365,6 +365,8 @@ class DistOptionHandler:
         self._optionmap['experimental_release'] = ['bool', 0]
         self._optionmap['release_description'] = ['str', None]
         self._optionmap['release_signscript'] = ['str', None]
+        self._optionmap['keyrings'] = ['list', None]
+        self._optionmap['extra_keyrings'] = ['list', None]
 
     def get_option_map(self, dist):
         ret = self._distributions[dist]
@@ -382,9 +384,10 @@ class DistOptionHandler:
             return self._configp.getint(dist, key)
         elif type == 'str':
             return self._configp.get(dist, key)
+        elif type == 'list':
+            return re.split(', ?', self._configp.get(dist, key))
         elif type == 'bool':
             return self._configp.getboolean(dist, key)
-
         assert(None)
             
 
@@ -711,8 +714,13 @@ class ArchiveDir:
             self.__dict__['_' + key] = configdict[key]
         do_mkdir(dir)
         self._batch_mode = batch_mode
-        self._keyrings = keyrings
-        if not extra_keyrings is None :
+        if configdict['keyrings']:
+            self._keyrings = configdict['keyrings']
+        else:
+            self._keyrings = keyrings
+        if configdict['extra_keyrings']:
+            self._extra_keyrings = configdict['extra_keyrings']
+        elif extra_keyrings:
             self._extra_keyrings = extra_keyrings
         else:
             self._extra_keyrings = []
