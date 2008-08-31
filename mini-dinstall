@@ -974,6 +974,7 @@ class ArchiveDir:
                     file = self._abspath(file)
                 target = os.path.join(rejectdir, os.path.basename(file))
                 do_rename(file, target)
+            do_rename(changefilename, os.path.join(rejectdir, os.path.basename(changefilename)))
             self._logger.info('Rejecting "%s": %s' % (changefilename, `exception`))
         except Exception:
             self._logger.error("Unhandled exception while rejecting %s; archive may be in inconsistent state" % (changefilename,))
