@@ -63,7 +63,7 @@ class SignedFile:
             self._signature = string.join
             return ''
         return line
-            
+
     def readlines(self):
         ret = []
         while 1:
@@ -85,7 +85,7 @@ class SignedFile:
 
     def getSignatureVersion(self):
         return self._signatureversion
-            
+
 if __name__=="__main__":
     import sys
     if len(sys.argv) == 0:

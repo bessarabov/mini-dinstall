@@ -74,5 +74,5 @@ class GPGSigVerifier:
                 msg = "gpgv died with signal %d" % (os.WTERMSIG(status),)
             raise GPGSigVerificationFailure(msg, output)
         return output
- 
+
 # vim:ts=4:sw=4:et:

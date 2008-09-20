@@ -92,7 +92,7 @@ class MtimeDirectoryNotifier(DirectoryNotifier):
         self._polltime = poll_time
         for dir in dirs:
             self._dirmap[dir] = os.stat(os.path.join(self._cwd, dir))[stat.ST_MTIME]
-    
+
     def poll(self, timeout=None):
         timeout_time = None
         if timeout:
@@ -123,7 +123,7 @@ class DnotifyDirectoryNotifier(DirectoryNotifier):
         self._queue = Queue.Queue()
         dnotify = DnotifyThread(self._queue, self._dirs, self._logger)
         dnotify.start()
-        
+
     def poll(self, timeout=None):
         # delete duplicates
         i = self._queue.qsize()
@@ -164,7 +164,7 @@ class DnotifyThread(threading.Thread):
         self._queue = queue
         self._dirs = dirs
         self._logger = logger
-        
+
     def run(self):
         self._logger.debug('Starting dnotify reading thread')
         (infd, outfd) = os.pipe()

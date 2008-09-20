@@ -157,7 +157,7 @@ for key, val in opts:
 
 def do_mkdir(name):
     if os.access(name, os.X_OK):
-        return    
+        return
     try:
         logger.info('Creating directory "%s"' % (name))
     except:
@@ -377,7 +377,7 @@ class DistOptionHandler:
                 ret[key] = self.get_option (type, 'DEFAULT', key)
             if self._configp.has_option (dist, key):
                 ret[key] = self.get_option (type, dist, key)
-        return ret            
+        return ret
 
     def get_option (self, type, dist, key):
         if type == 'int':
@@ -389,7 +389,7 @@ class DistOptionHandler:
         elif type == 'bool':
             return self._configp.getboolean(dist, key)
         assert(None)
-            
+
 
 distoptionhandler = DistOptionHandler(distributions, configp)
 
@@ -424,8 +424,8 @@ logger.debug("Distributions: %s" % (distributions,))
 
 #     def renameFile(self, source, dst):
 #         self._start_op('rename', 
-    
-        
+
+
 #     def _sync():
 #         os.system("sync")
 os.chdir(toplevel_directory)
@@ -486,7 +486,7 @@ class IncomingDir(threading.Thread):
         self._last_failed_targets = {}
         self._eventqueue = Queue.Queue()
         self._done_event = threading.Event()
-	# ensure we always have some reprocess queue
+        # ensure we always have some reprocess queue
         self._reprocess_queue = {}
 
     def run(self):
@@ -524,17 +524,17 @@ class IncomingDir(threading.Thread):
         self._logger.debug("glob: " + globpath)
         changefilenames = glob.glob(globpath)
         for changefilename in changefilenames:
-	  if not self._reprocess_queue.has_key(changefilename):
-            self._logger.info('Examining "%s"' % (changefilename,))
-            changefile = ChangeFile()
-            try:
-                changefile.load_from_file(changefilename)
-            except ChangeFileException:
-                self._logger.debug("Unable to parse \"%s\", skipping" % (changefilename,))
-                continue
-            ret.append((changefilename, changefile))
-	  else:
-	    self._logger.debug('Skipping "%s" during new scan because it is in the reprocess queue.' % (changefilename,))
+            if not self._reprocess_queue.has_key(changefilename):
+                self._logger.info('Examining "%s"' % (changefilename,))
+                changefile = ChangeFile()
+                try:
+                    changefile.load_from_file(changefilename)
+                except ChangeFileException:
+                    self._logger.debug("Unable to parse \"%s\", skipping" % (changefilename,))
+                    continue
+                ret.append((changefilename, changefile))
+            else:
+                self._logger.debug('Skipping "%s" during new scan because it is in the reprocess queue.' % (changefilename,))
         return ret
 
     def _changefile_ready(self, changefilename, changefile):
@@ -630,12 +630,12 @@ class IncomingDir(threading.Thread):
                     changefile = ChangeFile()
                     changefile.load_from_file(changefilename)
                 except (ChangeFileException,IOError), e:
-		    if not os.path.exists(changefilename):
-		      self._logger.info('Changefile "%s" got removed' % (changefilename,))
-		    else:
-		      self._logger.exception("Unable to load change file \"%s\"" % (changefilename,))
-		      self._logger.warn("Marking \"%s\" as screwed" % (changefilename,))
-		      fucked.append(changefilename)
+                    if not os.path.exists(changefilename):
+                        self._logger.info('Changefile "%s" got removed' % (changefilename,))
+                    else:
+                        self._logger.exception("Unable to load change file \"%s\"" % (changefilename,))
+                        self._logger.warn("Marking \"%s\" as screwed" % (changefilename,))
+                        fucked.append(changefilename)
                     del self._reprocess_queue[changefilename]
                     continue
                 if (curtime - starttime) > self._max_retry_time:
@@ -647,8 +647,8 @@ class IncomingDir(threading.Thread):
                         self._logger.debug('Preparing to install "%s"' % (changefilename,))
                         try:
                             self._install_changefile(changefilename, changefile, doing_reprocess)
-			    self._logger.debug('Removing "%s" from incoming queue after successful install.' % (changefilename,))
-			    del self._reprocess_queue[changefilename]
+                            self._logger.debug('Removing "%s" from incoming queue after successful install.' % (changefilename,))
+                            del self._reprocess_queue[changefilename]
                         except Exception, e:
                             logger.exception("Unable to install \"%s\"; adding to screwed list" % (changefilename,))
                             fucked.append(changefilename)
@@ -853,7 +853,7 @@ class ArchiveDir:
                 target = self._source_target(file)
                 newfiles.append((os.path.join(incomingdir, file), target, match.group(1), 'source'))
                 continue
-                
+
         all_arches = {}
         for arch in map(lambda x: x[3], newfiles):
             all_arches[arch] = 1
@@ -914,7 +914,7 @@ class ArchiveDir:
                     if match and match.group(1) in map(lambda x: x[2], newfiles):
                         oldfiles.append((file, target))
                         continue
-                            
+
         self._clean_targets = map(lambda x: x[1], oldfiles)
         allrenames = oldfiles + map(lambda x: x[:2], newfiles)
         try:
@@ -957,8 +957,8 @@ class ArchiveDir:
         return 0
 
     def _reject_changefile(self, changefilename, changefile, exception):
-        sourcename = changefile['source'] 
-        version = changefile['version'] 
+        sourcename = changefile['source']
+        version = changefile['version']
         incomingdir = os.path.dirname(changefilename)
         try:
             f = open(os.path.join(rejectdir, "%s_%s.reason" % (sourcename, version)), 'w')
@@ -1015,7 +1015,7 @@ class SimpleSubdirArchiveDir(ArchiveDir):
                     ret.append((match.group(1), match.group(2), match.group(3)))
         return ret
 
-    
+
 class FlatArchiveDir(ArchiveDir):
     def _read_source_dir(self):
         return os.listdir(self._dir)
@@ -1050,7 +1050,7 @@ class ArchiveDirIndexer(threading.Thread):
         do_mkdir(dir)
         self._use_dnotify = use_dnotify
         self._batch_mode = batch_mode
-        self._done_event = threading.Event()    
+        self._done_event = threading.Event()
 
     def _abspath(self, *args):
         return os.path.abspath(apply(os.path.join, [self._dir] + list(args)))
@@ -1116,7 +1116,7 @@ class ArchiveDirIndexer(threading.Thread):
                 self._logger.exception("failure while running Release signature script")
                 return None
         return 1
-        
+
     # Copied from ArchiveDir
     def _run_script(self, changefilename, script, dir=None):
         if script:
@@ -1209,7 +1209,7 @@ class ArchiveDirIndexer(threading.Thread):
             obj = self._eventqueue.get()
             if type(obj) == type(''):
                 self._logger.debug('got dir change')
-                dir = obj            
+                dir = obj
             elif type(obj) == type(None):
                 self._logger.debug('got general event')
                 setevent = None
@@ -1290,7 +1290,7 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
                     self._logger.info('Packages generation complete')
                 else:
                     self._logger.info('Skipping generation of Packages file for %s' % (arch,))
-                    
+
             else:
                 pkgsfile = self._relpath(arch, 'Sources')
                 if force or (not os.access(pkgsfile, os.R_OK)) or dirmtime > os.stat(pkgsfile)[stat.ST_MTIME]:
@@ -1547,7 +1547,7 @@ else:
         archive = archivemap[dist][1]
         logger.info('Die event caught; waiting for archive %s to finish' % (archive.getName(),))
         archive.wait()
-    
+
 #logging.shutdown()
 logger.debug('Removing lock file: ' + lockfilename)
 os.unlink(lockfilename)

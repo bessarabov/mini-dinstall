@@ -50,7 +50,7 @@ class DpkgParagraph(DpkgOrderedDatalist):
         value = None
         while 1:
             line = f.readline()
-            if not line: 
+            if not line:
                 return
             # skip blank lines until we reach a paragraph
             if line == '\n':
@@ -124,10 +124,10 @@ class DpkgSourceControl( DpkgControl ):
         f = SignedFile(f)
         self.source = self._load_one( f )
         DpkgControl.load( self, f )
-    
+
     def __repr__( self ):
         return self.source.__repr__() + "\n" + DpkgControl.__repr__( self )
-    
+
     def _store( self, f ):
         "Write our control data to a file object"
         self.source._store( f )

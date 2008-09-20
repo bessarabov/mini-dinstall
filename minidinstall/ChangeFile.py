@@ -29,16 +29,16 @@ class ChangeFileException(Exception):
         self._value = value
     def __str__(self):
         return `self._value`
-        
+
 class ChangeFile(DpkgControl.DpkgParagraph):
     md5_re = r'^(?P<md5>[0-9a-f]{32})[ \t]+(?P<size>\d+)[ \t]+(?P<section>[-/a-zA-Z0-9]+)[ \t]+(?P<priority>[-a-zA-Z0-9]+)[ \t]+(?P<file>[0-9a-zA-Z][-+:.,=~0-9a-zA-Z_]+)$'
     sha1_re = r'^(?P<sha1>[0-9a-f]{40})[ \t]+(?P<size>\d+)[ \t]+(?P<file>[0-9a-zA-Z][-+:.,=~0-9a-zA-Z_]+)$'
     sha256_re = r'^(?P<sha256>[0-9a-f]{64})[ \t]+(?P<size>\d+)[ \t]+(?P<file>[0-9a-zA-Z][-+:.,=~0-9a-zA-Z_]+)$'
 
-    def __init__(self): 
+    def __init__(self):
         DpkgControl.DpkgParagraph.__init__(self)
         self._logger = logging.getLogger("mini-dinstall")
-        
+
     def load_from_file(self, filename):
         f = SignedFile.SignedFile(open(filename))
         self.load(f)
@@ -78,7 +78,7 @@ class ChangeFile(DpkgControl.DpkgParagraph):
                     raise ChangeFileException("Couldn't parse file entry \"%s\" in Files field of .changes" % (line,))
                 output[hash].append([match.group(hash), match.group('size'), match.group('file') ])
         return output
-        
+
     def verify(self, sourcedir):
         """ verify size and hash values from changes file """
         checksum = self._get_checksum_from_changes()
@@ -86,7 +86,7 @@ class ChangeFile(DpkgControl.DpkgParagraph):
             for (hashsum, size, filename) in checksum[hash]:
                 self._verify_file_integrity(os.path.join(sourcedir, filename), int(size), hash, hashsum)
 
-            
+
     def _verify_file_integrity(self, filename, expected_size, hash, expected_hashsum):
         """ check uploaded file integrity """
         self._logger.debug('Checking integrity of %s' % (filename,))

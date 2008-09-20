@@ -21,19 +21,19 @@
 import os, errno, time, string, re, popen2
 
 def dup2(fd,fd2):
-  # dup2 with EBUSY retries (cf. dup2(2) and Debian bug #265513)
-  success = 0
-  tries = 0
-  while (not success):
-    try:
-      os.dup2(fd,fd2)
-      success = 1
-    except OSError, e:
-      if (e.errno != errno.EBUSY) or (tries >= 3):
-	raise
-      # wait 0-2 seconds befor next try
-      time.sleep(tries)
-      tries += 1
+    # dup2 with EBUSY retries (cf. dup2(2) and Debian bug #265513)
+    success = 0
+    tries = 0
+    while (not success):
+        try:
+            os.dup2(fd,fd2)
+            success = 1
+        except OSError, e:
+            if (e.errno != errno.EBUSY) or (tries >= 3):
+                raise
+            # wait 0-2 seconds befor next try
+            time.sleep(tries)
+            tries += 1
 
 def format_changes(L):
     """ remove changelog header and all lines with only a dot """
