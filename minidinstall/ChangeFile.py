@@ -67,7 +67,7 @@ class ChangeFile(DpkgControl.DpkgParagraph):
             try:
                 self[hashes[hash][0]]
             except KeyError:
-                self._logger.warn("Can't find %s checksums in changes file '%s'" % (hash, os.path.basename(self._file)))
+                self._logger.warn("Can't find %s checksum in changes file '%s'" % (hash, os.path.basename(self._file)))
                 hashes_checked.pop(hash)
 
         for hash in hashes_checked:
