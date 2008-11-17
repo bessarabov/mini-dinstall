@@ -50,10 +50,10 @@ def get_file_sum(self, type, filename):
     """ generate hash sums for file """
     ret = _get_external_file_sum(self, type, filename)
     if not ret:
-        ret = _get_internal_file_sum(type, filename)
+        ret = _get_internal_file_sum(self, type, filename)
     return ret
 
-def _get_internal_file_sum(type, filename):
+def _get_internal_file_sum(self ,type, filename):
     """ generate hash sums for file with python modules """
     if type == 'md5':
         import md5
@@ -64,6 +64,7 @@ def _get_internal_file_sum(type, filename):
     elif type == 'sha256':
         from Crypto.Hash import SHA256
         sum = SHA256.new()
+    self._logger.debug("Generate %s (python-internal) for %s" % (type, filename))
     f = open(filename)
     buf = f.read(8192)
     while buf != '':
