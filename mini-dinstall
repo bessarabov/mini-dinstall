@@ -796,9 +796,24 @@ class ArchiveDir:
         do_rename(changefilename, target)
         self._logger.info('Successfully installed %s %s to %s' % (sourcename, version, self._name))
         if self._mail_on_success:
-            changefile ['changes_without_dot'] = misc.format_changes(changefile['changes'])
-            self.mailHandler.setSubject(mail_subject_template % changefile)
-            self._success_logger.info(mail_body_template % changefile)
+            done = False
+            missing_fields = []
+            if changefile.has_key('changes'):
+                changefile ['changes_without_dot'] = misc.format_changes(changefile['changes'])
+            while not done:
+                try:
+                    mail_subject = mail_subject_template % changefile
+                    mail_body = mail_body_template % changefile
+                except KeyError, exc:
+                    key = exc.args[0]
+                    changefile[key] = ''
+                    missing_fields.append(key)
+                else:
+                    done = True
+            if missing_fields:
+                mail_body = mail_body + "\n\nMissing changefile fields: %s" % missing_fields
+            self.mailHandler.setSubject(mail_subject)
+            self._success_logger.info(mail_body)
         
         if self._post_install_script:
             try:
