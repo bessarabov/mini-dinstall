@@ -1345,7 +1345,7 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
 
             if not release_needed:
                 self._logger.info("Skipping Release generation")
-                return
+                continue
             self._logger.info("Generating Release...")
             if no_act:
                 self._logger.info("Release generation complete")
