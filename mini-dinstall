@@ -32,6 +32,7 @@ from minidinstall.DebianSigVerifier import *
 from minidinstall.GPGSigVerifier import *
 from minidinstall.version import *
 import minidinstall.misc
+import minidinstall.mail
 
 debchanges_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.changes$')
 debpackage_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.u?deb$')
@@ -812,8 +813,7 @@ class ArchiveDir:
                     done = True
             if missing_fields:
                 mail_body = mail_body + "\n\nMissing changefile fields: %s" % missing_fields
-            self.mailHandler.setSubject(mail_subject)
-            self._success_logger.info(mail_body)
+            minidinstall.mail.send(mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.getfqdn()), mail_to, mail_body, mail_subject)
         
         if self._post_install_script:
             try:
