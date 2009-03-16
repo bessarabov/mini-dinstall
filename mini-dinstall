@@ -368,6 +368,7 @@ class DistOptionHandler:
         self._optionmap['release_signscript'] = ['str', None]
         self._optionmap['keyrings'] = ['list', None]
         self._optionmap['extra_keyrings'] = ['list', None]
+        self._optionmap['verify_sigs'] = ['bool', 0]
 
     def get_option_map(self, dist):
         ret = self._distributions[dist]
@@ -474,7 +475,7 @@ class ExceptionThrowingThreadedUnixStreamServer(SocketServer.ThreadingUnixStream
         die_event.set()
 
 class IncomingDir(threading.Thread):
-    def __init__(self, dir, archivemap, logger, trigger_reindex=1, poll_time=30, max_retry_time=172800, batch_mode=0, verify_sigs=0):
+    def __init__(self, dir, archivemap, logger, trigger_reindex=1, poll_time=30, max_retry_time=172800, batch_mode=0):
         threading.Thread.__init__(self, name="incoming")
         self._dir = dir
         self._archivemap = archivemap
@@ -482,7 +483,6 @@ class IncomingDir(threading.Thread):
         self._trigger_reindex = trigger_reindex
         self._poll_time = poll_time
         self._batch_mode = batch_mode
-        self._verify_sigs = verify_sigs
         self._max_retry_time = max_retry_time
         self._last_failed_targets = {}
         self._eventqueue = Queue.Queue()
@@ -555,7 +555,7 @@ class IncomingDir(threading.Thread):
         if not dist in self._archivemap.keys():
             raise DinstallException('Unknown distribution "%s" in \"%s\"' % (dist, changefilename,))
         logger.debug('Installing %s in archive %s' % (changefilename, self._archivemap[dist][1].getName()))
-        self._archivemap[dist][0].install(changefilename, changefile, self._verify_sigs)
+        self._archivemap[dist][0].install(changefilename, changefile)
         if self._trigger_reindex:
             if doing_reprocess:
                 logger.debug('Waiting on archive %s to reprocess' % (self._archivemap[dist][1].getName()))
@@ -706,7 +706,7 @@ def parse_versions(fullversion):
     return (upstreamver, debianversion)
 
 class ArchiveDir:
-    def __init__(self, dir, logger, configdict, batch_mode=0, keyrings=None, extra_keyrings=None):
+    def __init__(self, dir, logger, configdict, batch_mode=0, keyrings=None, extra_keyrings=None, verify_sigs=0):
         self._dir = dir
         self._name = os.path.basename(os.path.abspath(dir))
         self._logger = logger
@@ -715,6 +715,10 @@ class ArchiveDir:
             self.__dict__['_' + key] = configdict[key]
         do_mkdir(dir)
         self._batch_mode = batch_mode
+        if configdict.has_key('verify_sigs'):
+            self._verify_sigs = configdict['verify_sigs']
+        else:
+            self._verify_sigs = verify_sigs
         if configdict['keyrings']:
             self._keyrings = configdict['keyrings']
         else:
@@ -742,10 +746,10 @@ class ArchiveDir:
     def _relpath(self, *args):
         return apply(os.path.join, [self._name] + list(args))
 
-    def install(self, changefilename, changefile, verify_sigs):
+    def install(self, changefilename, changefile):
         retval = 0
         try:
-                retval = self._install_run_scripts(changefilename, changefile, verify_sigs)
+                retval = self._install_run_scripts(changefilename, changefile)
         except Exception:
             self._logger.exception("Unhandled exception during installation")
         if not retval:
@@ -754,11 +758,11 @@ class ArchiveDir:
     def reject(self, changefilename, changefile, reason):
         self._reject_changefile(changefilename, changefile, reason)
 
-    def _install_run_scripts(self, changefilename, changefile, verify_sigs):
+    def _install_run_scripts(self, changefilename, changefile):
         self._logger.info('Preparing to install \"%s\" in archive %s' % (changefilename, self._name,))
         sourcename = changefile['source']
         version = changefile['version']
-        if verify_sigs:
+        if self._verify_sigs:
             self._logger.info('Verifying signature on "%s"' % (changefilename,))
             try:
                 if self._keyrings:
@@ -1518,7 +1522,7 @@ for dist in distributions.keys():
         newclass = SimpleSubdirArchiveDir
     else:
         newclass = FlatArchiveDir
-    archivemap[dist] = [newclass(dist, logger, distributions[dist], batch_mode=batch_mode, keyrings=default_keyrings, extra_keyrings=default_extra_keyrings), None]
+    archivemap[dist] = [newclass(dist, logger, distributions[dist], batch_mode=batch_mode, keyrings=default_keyrings, extra_keyrings=default_extra_keyrings, verify_sigs=default_verify_sigs), None]
 
 # Create archive indexing threads, but don't start them yet
 for dist in distributions.keys():
@@ -1533,7 +1537,7 @@ for dist in distributions.keys():
 
 # Now: kick off the incoming processor
 logger.info('Initializing incoming processor')
-incoming = IncomingDir(incoming_subdir, archivemap, logger, trigger_reindex=trigger_reindex, poll_time=default_poll_time, max_retry_time=default_max_retry_time, batch_mode=batch_mode, verify_sigs=default_verify_sigs)
+incoming = IncomingDir(incoming_subdir, archivemap, logger, trigger_reindex=trigger_reindex, poll_time=default_poll_time, max_retry_time=default_max_retry_time, batch_mode=batch_mode)
 logger.debug('Starting incoming processor')
 incoming.start()
 if batch_mode:
