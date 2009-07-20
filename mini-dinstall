@@ -347,6 +347,7 @@ class DistOptionHandler:
         self._configp = configp
         self._distributions = distributions
         self._optionmap = {}
+        self._optionmap['alias'] = ['str', None]
         self._optionmap['poll_time'] = ['int', default_poll_time]
         # two days
         self._optionmap['max_retry_time'] = ['int', default_max_retry_time]
@@ -551,7 +552,14 @@ class IncomingDir(threading.Thread):
         return 1
 
     def _install_changefile(self, changefilename, changefile, doing_reprocess):
-        dist = changefile['distribution']
+        changefiledist = changefile['distribution']
+        for dist in distributions.keys():
+            distributions[dist] = distoptionhandler.get_option_map(dist)
+            if distributions[dist].has_key('alias') and changefiledist in distributions[dist]['alias']:
+                logger.info('Distribution "%s" is an alias for "%s"' % (changefiledist, dist))
+                break
+            else:
+                dist = changefiledist
         if not dist in self._archivemap.keys():
             raise DinstallException('Unknown distribution "%s" in \"%s\"' % (dist, changefilename,))
         logger.debug('Installing %s in archive %s' % (changefilename, self._archivemap[dist][1].getName()))
