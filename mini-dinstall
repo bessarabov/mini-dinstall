@@ -555,7 +555,7 @@ class IncomingDir(threading.Thread):
         changefiledist = changefile['distribution']
         for dist in distributions.keys():
             distributions[dist] = distoptionhandler.get_option_map(dist)
-            if distributions[dist].has_key('alias') and changefiledist in distributions[dist]['alias']:
+            if distributions[dist]['alias'] != None and changefiledist in distributions[dist]['alias']:
                 logger.info('Distribution "%s" is an alias for "%s"' % (changefiledist, dist))
                 break
             else:
