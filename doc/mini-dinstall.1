@@ -119,7 +119,9 @@ Additional GnuPG keyrings to use for signature verification.
 .TP
 .B incoming_permissions
 The permissions for the \fIincoming\fR directory. \fBmini\-dinstall\fR will
-attempt to set the directory's permissions at startup. Defaults to 0750.
+attempt to set the directory's permissions at startup. A value of zero (\''0\''
+or \''0000\'') will disable permission setting. Doing this, you MUST set
+permission for incoming by hand! Defaults to 0750.
 .TP
 .B keyrings
 GnuPG keyrings to use for signature verification of changes files. Setting this

@@ -173,6 +173,8 @@ def do_rename(source, target):
     do_and_log('Renaming "%s" to "%s"' % (source, target), os.rename, source, target)
 
 def do_chmod(name, mode):
+    if mode == 0:
+        return
     do_and_log('Changing mode of "%s" to %o' % (name, mode), os.chmod, name, mode)
 
 logger.setLevel(logging.DEBUG)
