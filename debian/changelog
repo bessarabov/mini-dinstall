@@ -1,3 +1,21 @@
+mini-dinstall (0.6.27) unstable; urgency=low
+
+  [ Christoph Goehre ]
+  * [fdef0f3] regenerate reliable Release files on archive_style
+    simple-subdir
+  * [0607dbf] demote depends on gpgv to recommends
+  * [b514d38] send upload information mails with utf-8 charset
+    (Closes: #505144)
+  * [364119c] allow verify_sigs per repository (Closes: #516263)
+  * [9017b45] support distribution aliases, thanks Luca Capello
+    (Closes: #291340)
+  * [039b733] add generic do_and_log function
+  * [15f8c38] allow to disable chmod on incomming (Closes: #535558)
+  * [cf1424e] add 'X-Mini-Dinstall' header field to upload email
+    (Closes: #539124)
+
+ -- Christoph Goehre <christoph.goehre@gmx.de>  Sun, 16 Aug 2009 18:17:14 +0200
+
 mini-dinstall (0.6.26) unstable; urgency=low
 
   [ Christoph Goehre ]
