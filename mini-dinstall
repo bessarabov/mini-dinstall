@@ -884,7 +884,7 @@ class ArchiveDir:
         if not self._keep_old:
             found_old_bins = 0
             for (oldversion, oldarch) in map(lambda x: x[1:], self._get_package_versions()):
-                if not all_arches.has_key(oldarch) and apt_pkg.VersionCompare(oldversion, version) < 0:
+                if not all_arches.has_key(oldarch) and apt_pkg.version_compare(oldversion, version) < 0:
                     found_old_bins = 1
             for (pkgname, arch) in map(lambda x: x[2:], newfiles):
                 if arch == 'source' and found_old_bins:
@@ -921,7 +921,7 @@ class ArchiveDir:
                     if match and match.group(1) == sourcename:
                         if not is_native:
                             (oldupstreamver, olddebianver) = parse_versions(match.group(2))
-                            if apt_pkg.VersionCompare(oldupstreamver, newupstreamver) < 0:
+                            if apt_pkg.version_compare(oldupstreamver, newupstreamver) < 0:
                                 self._logger.debug('old upstream tarball "%s" version %s < %s, tagging for deletion' % (file, oldupstreamver, newupstreamver))
                                 oldfiles.append((file, target))
                                 continue
