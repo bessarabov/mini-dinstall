@@ -33,6 +33,7 @@ from minidinstall.GPGSigVerifier import *
 from minidinstall.version import *
 import minidinstall.misc
 import minidinstall.mail
+import minidinstall.tweet
 
 debchanges_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.changes$')
 debpackage_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.u?deb$')
@@ -53,6 +54,7 @@ logfile_name = 'mini-dinstall.log'
 configfile_names = ['/etc/mini-dinstall.conf', '~/.mini-dinstall.conf']
 use_dnotify = 0
 mail_on_success = 1
+tweet_on_success = 1
 default_poll_time = 30
 default_max_retry_time = 2 * 24 * 60 * 60
 default_mail_log_level = logging.ERROR
@@ -62,6 +64,9 @@ mail_log_flush_count = 10
 mail_to = getpass.getuser()
 mail_server = 'localhost'
 incoming_permissions = 0750
+tweet_server = 'identica'
+tweet_user = None
+tweet_password = None
 
 default_architectures = ["all", "i386"]
 default_distributions = ("unstable",)
@@ -76,6 +81,8 @@ Changed-By: %(changed-by)s
 Changes:
 %(changes_without_dot)s
 """
+
+tweet_template = "Installed %(source)s %(version)s to %(distribution)s"
 
 def usage(ecode, ver_only=None):
     print "mini-dinstall", pkg_version
@@ -332,6 +339,15 @@ if configp.has_option('DEFAULT', 'mail_subject_template'):
     mail_subject_template = configp.get('DEFAULT', 'mail_subject_template', 1)
 if configp.has_option('DEFAULT', 'mail_body_template'):
     mail_body_template = configp.get('DEFAULT', 'mail_body_template', 1)
+if configp.has_option('DEFAULT', 'tweet_template'):
+    tweet_template = configp.get('DEFAULT', 'tweet_template', 1)
+
+if configp.has_option('DEFAULT', 'tweet_server'):
+    tweet_server = configp.get('DEFAULT', 'tweet_server', 1)
+if configp.has_option('DEFAULT', 'tweet_user'):
+    tweet_user = configp.get('DEFAULT', 'tweet_user', 1)
+if configp.has_option('DEFAULT', 'tweet_password'):
+    tweet_password = configp.get('DEFAULT', 'tweet_password', 1)
 
 sects = configp.sections()
 if not len(sects) == 0:
@@ -360,6 +376,7 @@ class DistOptionHandler:
         self._optionmap['chown_changes_files'] = ['bool', 1]
         self._optionmap['keep_old'] = ['bool', None]
         self._optionmap['mail_on_success'] = ['bool', 1]
+        self._optionmap['tweet_on_success'] = ['bool', 1]
         self._optionmap['archive_style'] = ['str', None]
         # Release file stuff
         self._optionmap['generate_release'] = ['bool', 0]
@@ -829,7 +846,25 @@ class ArchiveDir:
             if missing_fields:
                 mail_body = mail_body + "\n\nMissing changefile fields: %s" % missing_fields
             minidinstall.mail.send(mail_server, 'Mini-Dinstall <%s@%s>' % (getpass.getuser(),socket.getfqdn()), mail_to, mail_body, mail_subject)
-        
+
+        if self._tweet_on_success:
+            done = False
+            missing_fields = []
+            if changefile.has_key('changes'):
+                changefile ['changes_without_dot'] = misc.format_changes(changefile['changes'])
+            while not done:
+                try:
+                    tweet_body = tweet_template % changefile
+                except KeyError, exc:
+                    key = exc.args[0]
+                    changefile[key] = ''
+                    missing_fields.append(key)
+                else:
+                    done = True
+            if missing_fields:
+                tweet_body = tweet_body + "\n\n(errs: %s)" % missing_fields
+            minidinstall.tweet.send(tweet_body, tweet_server, tweet_user, tweet_password)
+
         if self._post_install_script:
             try:
                 self._logger.debug("Running post-installation script: " + self._post_install_script)
