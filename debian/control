@@ -3,7 +3,7 @@ Priority: optional
 Section: devel
 Maintainer: Christoph Goehre <christoph.goehre@gmx.de>
 Uploaders: Guido Guenther <agx@sigxcpu.org>
-Build-Depends: cdbs, debhelper (>= 4.1.25), python-dev, python-support (>= 0.3)
+Build-Depends: cdbs, debhelper (>= 7), python-dev, python-support (>= 0.3)
 DM-Upload-Allowed: yes
 Standards-Version: 3.8.4
 Vcs-Git: git://git.debian.org/git/mini-dinstall/mini-dinstall.git
