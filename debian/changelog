@@ -10,7 +10,7 @@ mini-dinstall (0.6.27) unstable; urgency=low
   * [9017b45] support distribution aliases, thanks Luca Capello
     (Closes: #291340)
   * [039b733] add generic do_and_log function
-  * [15f8c38] allow to disable chmod on incomming (Closes: #535558)
+  * [15f8c38] allow to disable chmod on incoming (Closes: #535558)
   * [cf1424e] add 'X-Mini-Dinstall' header field to upload email
     (Closes: #539124)
 
