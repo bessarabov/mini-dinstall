@@ -94,6 +94,7 @@ def usage(ecode, ver_only=None):
     print "  -b, --batch\t\tDon't daemonize; run once, then exit"
     print "  -r, --run\t\tProcess queue immediately"
     print "  -k, --kill\t\tKill the running mini-dinstall"
+    print "  --no-db\t\tDisable lookups on package database"
     print "  --help\t\tWhat you're looking at"
     print "  --version\t\tPrint the software version and exit"
     sys.exit(ecode)
@@ -101,7 +102,7 @@ def usage(ecode, ver_only=None):
 try:
     opts, args = getopt.getopt(sys.argv[1:], 'vqc:dnbrk',
                                ['verbose', 'quiet', 'config=', 'debug', 'no-log',
-                                'no-act', 'batch', 'run', 'kill', 'help', 'version', ])
+                                'no-act', 'batch', 'run', 'kill', 'no-db', 'help', 'version', ])
 except getopt.GetoptError, e:
     sys.stderr.write("Error reading arguments: %s\n" % e)
     usage(1)
@@ -124,6 +125,7 @@ no_act = 0
 debug_mode = 0
 run_mode = 0
 kill_mode = 0
+nodb_mode = 0
 no_log = 0
 batch_mode = 0
 custom_config_files = 0
@@ -155,6 +157,8 @@ for key, val in opts:
         run_mode = 1
     elif key in ('-k', '--kill'):
         kill_mode = 1
+    elif key in ('--no-db'):
+        nodb_mode = 1
 
 def do_and_log(msg, function, *args):
     try:
@@ -1081,7 +1085,11 @@ class ArchiveDirIndexer(threading.Thread):
         return apply(os.path.join, [self._name] + list(args))
 
     def _make_indexfile(self, dir, type, name):
-        cmdline = ['apt-ftparchive', type, dir, '--db', '%s.db' %dir]
+        if nodb_mode:
+            cmdline = ['apt-ftparchive', type, dir]
+        else:
+            cmdline = ['apt-ftparchive', type, dir, '--db', '%s.db' %dir]
+
         self._logger.debug("Running: " + string.join(cmdline, ' '))
         if no_act:
             return
