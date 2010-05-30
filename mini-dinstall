@@ -54,7 +54,7 @@ logfile_name = 'mini-dinstall.log'
 configfile_names = ['/etc/mini-dinstall.conf', '~/.mini-dinstall.conf']
 use_dnotify = 0
 mail_on_success = 1
-tweet_on_success = 1
+tweet_on_success = 0
 default_poll_time = 30
 default_max_retry_time = 2 * 24 * 60 * 60
 default_mail_log_level = logging.ERROR
@@ -376,7 +376,7 @@ class DistOptionHandler:
         self._optionmap['chown_changes_files'] = ['bool', 1]
         self._optionmap['keep_old'] = ['bool', None]
         self._optionmap['mail_on_success'] = ['bool', 1]
-        self._optionmap['tweet_on_success'] = ['bool', 1]
+        self._optionmap['tweet_on_success'] = ['bool', 0]
         self._optionmap['archive_style'] = ['str', None]
         # Release file stuff
         self._optionmap['generate_release'] = ['bool', 0]

@@ -177,6 +177,24 @@ Style of the email body. Valid values are the same as for the
 .RE
 .RE
 .TP
+.B tweet_server
+server to push tweets. Possible values are \fItwitter\fR or \fIidentica\fR
+.TP
+.B tweet_user
+username to login on tweet server
+.TP
+.B tweet_password
+password to login on tweet server
+.TP
+.B tweet_template
+Style of the tweet body. Valid values are the same as for the
+\fBmail_subject_template\fR option. Default is:
+.RS
+.PP
+ Installed %(source)s %(version)s to %(distribution)s
+.RE
+.RE
+.TP
 .B trigger_reindex
 In daemon mode, whether or not to recreate the Packages and Sources files after
 every upload. If you disable this, you probably want to enable
@@ -245,6 +263,9 @@ versions of the same packages are uploaded. Defaults to false.
 .TP
 .B mail_on_success
 Whether to mail on successful installation. Defaults to true.
+.TP
+.B tweet_on_success
+Whether to tweet (e.g. on twitter/identi.ca) on successful installation. Defaults to false.
 .TP
 .B max_retry_time
 The maximum amount of time to wait for an incomplete upload before rejecting
