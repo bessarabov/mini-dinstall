@@ -38,8 +38,8 @@ debchanges_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.changes$')
 debpackage_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.u?deb$')
 debsrc_dsc_re = re.compile('([-a-z0-9+.]+)_(.+?)\.dsc$')
 debsrc_diff_re = re.compile('([-a-z0-9+.]+)_(.+?)\.diff\.gz$')
-debsrc_orig_re = re.compile('([-a-z0-9+.]+)_(.+?)\.orig\.tar\.gz$')
-debsrc_native_re = re.compile('([-a-z0-9+.]+)_(.+?)\.tar\.gz$')
+debsrc_orig_re = re.compile('([-a-z0-9+.]+)_(.+?)\.orig[-a-z0-9]*\.tar\.(gz|bz2|lzma|xz)$')
+debsrc_native_re = re.compile('([-a-z0-9+.]+)_(.+?)\.tar\.(gz|bz2|lzma|xz)$')
 
 native_version_re = re.compile('\s*.*-');
 
