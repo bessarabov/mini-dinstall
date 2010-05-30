@@ -1,3 +1,29 @@
+mini-dinstall (0.6.28) unstable; urgency=low
+
+  [ Christoph Goehre ]
+  * [2793c0d] update pkg_version on clean target
+  * [ffd2489] lintian: add ${misc:Depends} to mini-dinstall package
+  * [4b8155e] bump up Standards-Version to 3.8.4
+  * [712898e] lintian: add blank line on debian NEWS file
+  * [b7c4ba8] lintian: spelling error in changelog s/incomming/incoming/
+  * [3181afb] lintian: depend on debhelper >= 7
+  * [d61eb9c] lintian: change Build-Depends python-dev to python
+  * [bdd0029] allow to disable 'db' option in apt-ftparchive (Closes: #513847)
+  * [3f611de] exit with 1 instead of backtrace by creating mini-dinstall's
+    folder
+  * [df7be9f] support Source format 3.0 (Closes: #571226)
+  * [4b3e336] disable tweeting on default and document tweet options in
+    manpage
+  * [37ca547] Switch to dpkg-source 3.0 (native) format
+
+  [ Julian Andres Klode ]
+  * [db1a6cd] Upgrade to the new python-apt API. (Closes: #572069)
+
+  [ Christopher R. Gabriel ]
+  * [92b2b34] added twitting support (e.g. for twitter/identi.ca)
+
+ -- Christoph Goehre <christoph.goehre@gmx.de>  Sun, 30 May 2010 19:33:52 +0200
+
 mini-dinstall (0.6.27) unstable; urgency=low
 
   [ Christoph Goehre ]
