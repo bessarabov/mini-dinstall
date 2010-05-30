@@ -171,7 +171,11 @@ def do_and_log(msg, function, *args):
 def do_mkdir(name):
     if os.access(name, os.X_OK):
         return
-    do_and_log('Creating directory "%s"' % (name), os.mkdir, name)
+    try:
+        do_and_log('Creating directory "%s"' % (name), os.mkdir, name)
+    except OSError, e:
+        print e
+        exit(1)
 
 def do_rename(source, target):
     do_and_log('Renaming "%s" to "%s"' % (source, target), os.rename, source, target)
