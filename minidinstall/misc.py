@@ -60,8 +60,7 @@ def _get_internal_file_sum(self ,type, filename):
     elif type == 'sha1':
         sum = hashlib.sha1()
     elif type == 'sha256':
-        from Crypto.Hash import SHA256
-        sum = SHA256.new()
+        sum = hashlib.sha256()
     self._logger.debug("Generate %s (python-internal) for %s" % (type, filename))
     f = open(filename)
     buf = f.read(8192)
