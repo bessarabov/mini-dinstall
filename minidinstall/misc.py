@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import os, errno, time, string, re, popen2
+import os, errno, time, string, re, popen2, hashlib
 
 def dup2(fd,fd2):
     # dup2 with EBUSY retries (cf. dup2(2) and Debian bug #265513)
@@ -56,11 +56,9 @@ def get_file_sum(self, type, filename):
 def _get_internal_file_sum(self ,type, filename):
     """ generate hash sums for file with python modules """
     if type == 'md5':
-        import md5
-        sum = md5.new()
+        sum = hashlib.md5()
     elif type == 'sha1':
-        import sha
-        sum = sha.new()
+        sum = hashlib.sha1()
     elif type == 'sha256':
         from Crypto.Hash import SHA256
         sum = SHA256.new()
