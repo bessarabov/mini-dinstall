@@ -193,7 +193,7 @@ def do_chmod(name, mode):
     do_and_log('Changing mode of "%s" to %o' % (name, mode), os.chmod, name, mode)
 
 logger.setLevel(logging.DEBUG)
-stderr_handler = logging.StreamHandler(strm=sys.stderr)
+stderr_handler = logging.StreamHandler()
 stderr_handler.setLevel(loglevel)
 logger.addHandler(stderr_handler)
 stderr_handler.setLevel(loglevel)
