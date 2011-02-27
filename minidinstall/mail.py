@@ -20,6 +20,7 @@
 
 import smtplib
 import email.mime.text
+import email.utils
 
 import logging
 
@@ -34,6 +35,8 @@ def send(smtp_server, smtp_from, smtp_to, body, subject="mini-dinstall mail noti
         mime_body['Subject'] = subject
         mime_body['From'] = smtp_from
         mime_body['To'] = smtp_to
+        mime_body['Date'] = email.utils.formatdate(localtime=True)
+        mime_body['Message-ID'] = email.utils.make_msgid()
         mime_body.add_header('X-Mini-Dinstall', 'YES')
 
         # Send via SMTP server
