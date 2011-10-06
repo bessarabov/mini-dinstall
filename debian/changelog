@@ -1,3 +1,19 @@
+mini-dinstall (0.6.29) unstable; urgency=low
+
+  [ Christoph Goehre ]
+  * [d4fa57e] logging.StreamHandler use sys.stderr as default output
+    (Closes: #613992, #644419)
+  * [91d0786] add Date and Message-ID header fields in email from mini-dinstall
+  * [d7f3643] bump up Standards-Version to 3.9.2
+  * [b659d79] DM-Upload-Allowed is superfluous since I'm DD
+
+  [ Sven Hartge ]
+  * [b27e3ab] add support for new InRelease file
+
+  [ Christoph Goehre ]
+
+ -- Christoph Goehre <christoph.goehre@gmx.de>  Thu, 06 Oct 2011 19:50:46 +0200
+
 mini-dinstall (0.6.28.1) unstable; urgency=low
 
   * The "Python 2.6 transitional" release
