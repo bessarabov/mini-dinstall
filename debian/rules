@@ -6,12 +6,11 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/python-distutils.mk
+include /usr/share/dpkg/default.mk
 
-minidinstall/version.py: debian/changelog
-	echo "pkg_version = \"$(DEB_UPSTREAM_VERSION)\"" > minidinstall/version.py
+%:
+	dh $@ --with python2
 
-clean:: minidinstall/version.py
-
-.PHONY: minidinstall/version.py
+override_dh_auto_clean:
+	echo "pkg_version = \"$(DEB_VERSION_UPSTREAM)\"" > minidinstall/version.py
+	dh_auto_clean
