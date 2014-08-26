@@ -3,7 +3,7 @@ Priority: optional
 Section: devel
 Maintainer: Christoph Goehre <christoph.goehre@gmx.de>
 Uploaders: Guido Guenther <agx@sigxcpu.org>
-Build-Depends: debhelper (>= 7), python (>= 2.6.6-3~), dh-python
+Build-Depends: debhelper (>= 9), python (>= 2.6.6-3~), dh-python
 Standards-Version: 3.9.5
 Vcs-Git: git://anonscm.debian.org/mini-dinstall/mini-dinstall.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=mini-dinstall/mini-dinstall.git;a=summary
