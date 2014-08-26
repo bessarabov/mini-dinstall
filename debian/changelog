@@ -1,3 +1,13 @@
+mini-dinstall (0.6.30) unstable; urgency=low
+
+  * [885f9fc] lintian: fix vcs-field-not-canonical
+  * [61d551a] bump up Standards-Version to 3.9.5
+  * [dbdacea] transition from python-support to dh_python2
+  * [dbf811a] switch from cdbs to dh
+  * [4ccc409] increase debhelper compat level to 9
+
+ -- Christoph Goehre <christoph.goehre@gmx.de>  Mon, 25 Aug 2014 19:50:08 -0700
+
 mini-dinstall (0.6.29) unstable; urgency=low
 
   [ Christoph Goehre ]
