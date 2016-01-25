@@ -1127,7 +1127,7 @@ class ArchiveDirIndexer(threading.Thread):
         if nodb_mode:
             cmdline = ['apt-ftparchive', type, dir]
         else:
-            cmdline = ['apt-ftparchive', type, dir, '--db', '%s.db' %dir]
+            cmdline = ['apt-ftparchive', type, dir, '-o', 'APT::FTPArchive::AlwaysStat=true', '--db', '%s.db' %dir]
 
         self._logger.debug("Running: " + string.join(cmdline, ' '))
         if no_act:
