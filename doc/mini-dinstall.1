@@ -299,8 +299,13 @@ The Origin field in the Release file. Defaults to the current user's username.
 .B release_suite
 The Suite field in the Release file. Defaults to \*(lqNone\*(rq.
 .TP
+.B backport_release
+The backport_release field marks the release as backport.
+Defaults to \*(lq0\*(rq.
 .B experimental_release
-The experimental_release field mark the release as experimental. Defaults to \*(lq0\*(rq.
+The experimental_release field marks the release as experimental.
+Defaults to \*(lq0\*(rq.
+If this option is set, it overrides the option backport_release.
 .TP
 .B release_signscript
 If specified, this script will be called to sign Release files. It will be
