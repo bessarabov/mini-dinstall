@@ -1125,7 +1125,9 @@ class ArchiveDirIndexer(threading.Thread):
 
     def _make_indexfile(self, dir, type, name, arch=None):
         cmdline = ['apt-ftparchive', type, dir,
-                   '-o', 'APT::FTPArchive::AlwaysStat=true']
+                   '-o', 'APT::FTPArchive::AlwaysStat=true',
+                   '-o', 'APT::FTPArchive::SHA1=false',
+                   '-o', 'APT::FTPArchive::MD5=false']
         if arch:
             cmdline += ['--arch', arch]
         if not nodb_mode:
@@ -1423,7 +1425,7 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
             f.write('Architectures: ' + arch + '\n')
             if self._release_description:
                 f.write('Description: ' + self._release_description + '\n')
-            for hash in [ 'md5', 'sha1', 'sha256' ]:
+            for hash in [ 'sha256' ]:
                     self._do_hash(hash, indexfiles, f)
             f.close()
             if self._sign_releasefile(os.path.basename(tmpname), self._abspath(arch)):
@@ -1524,7 +1526,7 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
         f.write('Architectures: ' + string.join(self._arches, ' ') + '\n')
         if self._release_description:
             f.write('Description: ' + self._release_description + '\n')
-        for hash in [ 'md5', 'sha1', 'sha256' ]:
+        for hash in [ 'sha256' ]:
             self._do_hash(hash, indexfiles, f)
         f.close()
         if self._sign_releasefile(tmpname, self._abspath()):
