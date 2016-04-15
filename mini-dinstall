@@ -1123,11 +1123,13 @@ class ArchiveDirIndexer(threading.Thread):
     def _relpath(self, *args):
         return apply(os.path.join, [self._name] + list(args))
 
-    def _make_indexfile(self, dir, type, name):
-        if nodb_mode:
-            cmdline = ['apt-ftparchive', type, dir]
-        else:
-            cmdline = ['apt-ftparchive', type, dir, '-o', 'APT::FTPArchive::AlwaysStat=true', '--db', '%s.db' %dir]
+    def _make_indexfile(self, dir, type, name, arch=None):
+        cmdline = ['apt-ftparchive', type, dir,
+                   '-o', 'APT::FTPArchive::AlwaysStat=true']
+        if arch:
+            cmdline += ['--arch', arch]
+        if not nodb_mode:
+            cmdline += ['--db', '%s.db' %dir]
 
         self._logger.debug("Running: " + string.join(cmdline, ' '))
         if no_act:
@@ -1143,7 +1145,10 @@ class ArchiveDirIndexer(threading.Thread):
             os.exit(1)
         os.close(outfd)
         stdout = os.fdopen(infd)
-        packagesfilename = os.path.join(dir, name)
+        if arch:
+            packagesfilename = os.path.join(dir, '%s-%s' % (name, arch))
+        else:
+            packagesfilename = os.path.join(dir, name)
         newpackagesfilename = packagesfilename + '.new'
         xzpackagesfilename = packagesfilename + '.xz'
         newxzpackagesfilename = newpackagesfilename + '.xz'
@@ -1168,6 +1173,9 @@ class ArchiveDirIndexer(threading.Thread):
 
     def _make_sourcesfile(self, dir):
         self._make_indexfile(dir, 'sources', 'Sources')
+
+    def _make_contentsfile(self, dir, arch):
+        self._make_indexfile(dir, 'contents', 'Contents', arch)
 
     def _sign_releasefile(self, name, dir):
         if self._release_signscript:
@@ -1452,6 +1460,17 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
         else:
             self._logger.info('Skipping generation of Sources file')
 
+        for arch in self._arches:
+            if arch == "all" or arch == "source":
+                continue
+            pkgsfile = self._abspath('Contents-%s' % arch)
+            if force or (not os.access(pkgsfile, os.R_OK)) or dirmtime > os.stat(pkgsfile)[stat.ST_MTIME]:
+                self._logger.info('Generating Contents file...')
+                self._make_contentsfile(self._relpath(), arch)
+                self._logger.info('Contents generation complete')
+            else:
+                self._logger.info('Skipping generation of Contents file')
+
     def _gen_release_impl(self, arches, force):
         targetname = self._abspath('Release')
         if not self._generate_release:
@@ -1519,7 +1538,12 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
         return [self._dir]
 
     def _get_all_indexfiles(self):
-        return ['Packages', 'Sources']
+        allindexes = []
+        for arch in self._arches:
+            if arch == "all" or arch == "source":
+                continue
+            allindexes += ["Contents-%s" % arch]
+        return ['Packages', 'Sources'] + allindexes
 
 if os.access(lockfilename, os.R_OK):
     logger.critical("lockfile \"%s\" exists (pid %s): is another mini-dinstall running?"  % (lockfilename, open(lockfilename).read(10)))
