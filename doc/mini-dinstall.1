@@ -300,12 +300,17 @@ The Origin field in the Release file. Defaults to the current user's username.
 The Suite field in the Release file. Defaults to \*(lqNone\*(rq.
 .TP
 .B backport_release
-The backport_release field marks the release as backport.
+If enabled, automatically install package upgrades from this repository
+only if the installed version of the package is higher than the version of
+the package in other sources.
 Defaults to \*(lq0\*(rq.
+.TP
 .B experimental_release
-The experimental_release field marks the release as experimental.
+If enabled, packages will not automatically install or upgrade to newer versions
+from this repository
+.PP
+If this option is set, it overrides the option \fBbackport_release\fR.
 Defaults to \*(lq0\*(rq.
-If this option is set, it overrides the option backport_release.
 .TP
 .B release_signscript
 If specified, this script will be called to sign Release files. It will be
