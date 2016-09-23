@@ -333,6 +333,8 @@ if configp.has_option('DEFAULT', 'extra_keyrings'):
     default_extra_keyrings = re.split(', ?', configp.get('DEFAULT', 'extra_keyrings'))
 if configp.has_option('DEFAULT', 'keyrings'):
     default_keyrings = re.split(', ?', configp.get('DEFAULT', 'keyrings'))
+if configp.has_option('DEFAULT', 'use_byhash'):
+    use_byhash = configp.getboolean('DEFAULT', 'use_byhash')
 if configp.has_option('DEFAULT', 'use_dnotify'):
     use_dnotify = configp.getboolean('DEFAULT', 'use_dnotify')
 if configp.has_option('DEFAULT', 'mail_subject_template'):
@@ -391,6 +393,7 @@ class DistOptionHandler:
         self._optionmap['keyrings'] = ['list', None]
         self._optionmap['extra_keyrings'] = ['list', None]
         self._optionmap['verify_sigs'] = ['bool', 0]
+        self._optionmap['use_byhash'] = ['bool', 1]
 
     def get_option_map(self, dist):
         ret = self._distributions[dist]
@@ -1170,6 +1173,17 @@ class ArchiveDirIndexer(threading.Thread):
         newxzpackagesfile.close()
         shutil.move(newpackagesfilename, packagesfilename)
         shutil.move(newxzpackagesfilename, xzpackagesfilename)
+        if self._use_byhash:
+            for hash in [ 'sha256' ]:
+                do_mkdir(os.path.join(dir, 'by-hash'))
+                hashdir = os.path.join(dir, 'by-hash', hash.upper())
+                do_mkdir(hashdir)
+                xzbyhash = self._get_file_sum(hash, xzpackagesfilename)
+                shutil.copy(xzpackagesfilename, os.path.join(hashdir, xzbyhash))
+                mtime = lambda f: os.stat(os.path.join(hashdir, f)).st_mtime
+                for oldbyhash in sorted(os.listdir(hashdir), key=mtime)[:-16]:
+                    self._logger.debug("Removing old by-hash file: %s" % oldbyhash)
+                    os.remove(os.path.join(hashdir,oldbyhash))
 
     def _make_packagesfile(self, dir):
         self._make_indexfile(dir, 'packages', 'Packages')
@@ -1427,6 +1441,8 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
                 f.write('ButAutomaticUpgrades: yes\n')
             f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
             f.write('Architectures: ' + arch + '\n')
+            if self._use_byhash:
+                f.write('Acquire-By-Hash: yes\n')
             if self._release_description:
                 f.write('Description: ' + self._release_description + '\n')
             for hash in [ 'sha256' ]:
@@ -1531,6 +1547,8 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
             f.write('ButAutomaticUpgrades: yes\n')
         f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
         f.write('Architectures: ' + string.join(self._arches, ' ') + '\n')
+        if self._use_byhash:
+            f.write('Acquire-By-Hash: yes\n')
         if self._release_description:
             f.write('Description: ' + self._release_description + '\n')
         for hash in [ 'sha256' ]:
