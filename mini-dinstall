@@ -37,6 +37,7 @@ import minidinstall.tweet
 
 debchanges_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.changes$')
 debpackage_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.u?deb$')
+debbuildinfo_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.buildinfo$')
 debsrc_dsc_re = re.compile('([-a-z0-9+.]+)_(.+?)\.dsc$')
 debsrc_diff_re = re.compile('([-a-z0-9+.]+)_(.+?)\.diff\.gz$')
 debsrc_orig_re = re.compile('([-a-z0-9+.]+)_(.+?)\.orig[-a-z0-9]*\.tar\.(gz|bz2|lzma|xz)$')
@@ -898,6 +899,14 @@ class ArchiveDir:
                 target = self._arch_target(arch, file)
                 newfiles.append((os.path.join(incomingdir, file), target, match.group(1), arch))
                 continue
+            match = debbuildinfo_re.search(file)
+            if match:
+                arch = match.group(3)
+                if not arch in self._arches:
+                    raise DinstallException("Unknown architecture: %s" % (arch))
+                target = self._arch_target(arch, file)
+                newfiles.append((os.path.join(incomingdir, file), target, match.group(1), arch))
+                continue
             match = debsrc_diff_re.search(file)
             if match:
                 is_sourceful = 1
@@ -938,7 +947,7 @@ class ArchiveDir:
                     continue
                 self._logger.debug('Scanning for old files')
                 for file in self._read_arch_dir(arch):
-                    match = debpackage_re.search(file)
+                    match = debpackage_re.search(file) or debbuildinfo_re.search(file)
                     if not match:
                         continue
                     oldpkgname = match.group(1)
