@@ -334,6 +334,8 @@ if configp.has_option('DEFAULT', 'expire_release_files'):
     expire_release_files = configp.getboolean('DEFAULT', 'expire_release_files')
 if configp.has_option('DEFAULT', 'extra_keyrings'):
     default_extra_keyrings = re.split(', ?', configp.get('DEFAULT', 'extra_keyrings'))
+if configp.has_option('DEFAULT', 'keyids'):
+    keyids = string.split(configp.get('DEFAULT', 'keyids'), ', ')
 if configp.has_option('DEFAULT', 'keyrings'):
     default_keyrings = re.split(', ?', configp.get('DEFAULT', 'keyrings'))
 if configp.has_option('DEFAULT', 'use_byhash'):
@@ -393,6 +395,7 @@ class DistOptionHandler:
         self._optionmap['backport_release'] = ['bool', 0]
         self._optionmap['release_description'] = ['str', None]
         self._optionmap['release_signscript'] = ['str', None]
+        self._optionmap['keyids'] = ['list', None]
         self._optionmap['keyrings'] = ['list', None]
         self._optionmap['expire_release_files'] = ['bool', 0]
         self._optionmap['extra_keyrings'] = ['list', None]
@@ -1434,9 +1437,11 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
                 f.write('NotAutomatic: yes\n')
                 f.write('ButAutomaticUpgrades: yes\n')
             f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
-            if self._expire_release_files:
+            if self._expire_release_files or self._keyids:
                 f.write('Valid-Until: ' + (datetime.datetime.utcnow() + datetime.timedelta(days=28)).strftime("%a, %d %b %Y %H:%M:%S UTC") + '\n')
             f.write('Architectures: ' + arch + '\n')
+            if self._keyids:
+                f.write('Signed-By: ' + string.join(self._keyids, ',') + '\n')
             if self._use_byhash:
                 f.write('Acquire-By-Hash: yes\n')
             if self._release_description:
@@ -1542,9 +1547,11 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
             f.write('NotAutomatic: yes\n')
             f.write('ButAutomaticUpgrades: yes\n')
         f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
-        if self._expire_release_files:
+        if self._expire_release_files or self._keyids:
             f.write('Valid-Until: ' + (datetime.datetime.utcnow() + datetime.timedelta(days=28)).strftime("%a, %d %b %Y %H:%M:%S UTC") + '\n')
         f.write('Architectures: ' + string.join(self._arches, ' ') + '\n')
+        if self._keyids:
+            f.write('Signed-By: ' + string.join(self._keyids, ',') + '\n')
         if self._use_byhash:
             f.write('Acquire-By-Hash: yes\n')
         if self._release_description:
