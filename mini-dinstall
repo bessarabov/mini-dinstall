@@ -19,7 +19,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os, sys, re, glob, getopt, time, traceback, lzma, getpass, socket
-import shutil, signal, threading, select, Queue, SocketServer
+import shutil, signal, threading, select, Queue, SocketServer, datetime
 import logging, logging.handlers
 #logging.basicConfig()
 import apt_pkg
@@ -330,6 +330,8 @@ if configp.has_option('DEFAULT', 'poll_time'):
     default_poll_time = configp.getint('DEFAULT', 'poll_time')
 if configp.has_option('DEFAULT', 'max_retry_time'):
     default_max_retry_time = configp.getint('DEFAULT', 'max_retry_time')
+if configp.has_option('DEFAULT', 'expire_release_files'):
+    expire_release_files = configp.getboolean('DEFAULT', 'expire_release_files')
 if configp.has_option('DEFAULT', 'extra_keyrings'):
     default_extra_keyrings = re.split(', ?', configp.get('DEFAULT', 'extra_keyrings'))
 if configp.has_option('DEFAULT', 'keyrings'):
@@ -392,6 +394,7 @@ class DistOptionHandler:
         self._optionmap['release_description'] = ['str', None]
         self._optionmap['release_signscript'] = ['str', None]
         self._optionmap['keyrings'] = ['list', None]
+        self._optionmap['expire_release_files'] = ['bool', 0]
         self._optionmap['extra_keyrings'] = ['list', None]
         self._optionmap['verify_sigs'] = ['bool', 0]
         self._optionmap['use_byhash'] = ['bool', 1]
@@ -1431,6 +1434,8 @@ class SimpleSubdirArchiveDirIndexer(ArchiveDirIndexer):
                 f.write('NotAutomatic: yes\n')
                 f.write('ButAutomaticUpgrades: yes\n')
             f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
+            if self._expire_release_files:
+                f.write('Valid-Until: ' + (datetime.datetime.utcnow() + datetime.timedelta(days=28)).strftime("%a, %d %b %Y %H:%M:%S UTC") + '\n')
             f.write('Architectures: ' + arch + '\n')
             if self._use_byhash:
                 f.write('Acquire-By-Hash: yes\n')
@@ -1537,6 +1542,8 @@ class FlatArchiveDirIndexer(ArchiveDirIndexer):
             f.write('NotAutomatic: yes\n')
             f.write('ButAutomaticUpgrades: yes\n')
         f.write('Date: ' + time.strftime("%a, %d %b %Y %H:%M:%S UTC", time.gmtime()) + '\n')
+        if self._expire_release_files:
+            f.write('Valid-Until: ' + (datetime.datetime.utcnow() + datetime.timedelta(days=28)).strftime("%a, %d %b %Y %H:%M:%S UTC") + '\n')
         f.write('Architectures: ' + string.join(self._arches, ' ') + '\n')
         if self._use_byhash:
             f.write('Acquire-By-Hash: yes\n')
