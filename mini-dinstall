@@ -36,7 +36,7 @@ import minidinstall.mail
 import minidinstall.tweet
 
 debchanges_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.changes$')
-debpackage_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.u?deb$')
+debpackage_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.(d|u)?deb$')
 debbuildinfo_re = re.compile('([-a-z0-9+.]+)_(.+?)_([-a-zA-Z0-9]+)\.buildinfo$')
 debsrc_dsc_re = re.compile('([-a-z0-9+.]+)_(.+?)\.dsc$')
 debsrc_diff_re = re.compile('([-a-z0-9+.]+)_(.+?)\.diff\.gz$')
