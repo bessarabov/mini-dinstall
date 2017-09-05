@@ -1,3 +1,37 @@
+mini-dinstall (0.6.31) unstable; urgency=medium
+
+  [ Unit 193 ]
+  * [acad13c] Add xz support for package files.
+  * [e78b016] Allow re-installing same version packages. (Closes: #680782)
+  * [7b759e5] Remove bzip2 compressed package files.
+  * [c660ff0] Remove gzip compressed package files.
+  * [a208f0d] Generate Contents files when using flat archive type.
+  * [c3615cb] Only use sha256 hashes, dropping sha1 and md5.
+  * [78fa964] Fix manpage formatting, describe backport_release and
+    experimental_release.
+  * [ce6a7ab] Add configurable support for by-hash, on by default.
+  * [159f01d] Properly handle .buildinfo files.
+  * [36078e2] Add a new option 'expire_release_files' to enable 'Valid-Until'
+    with a life of 4 weeks.
+  * [8f59711] Enable the 'Signed-By' feature by setting GPG IDs in 'keyids'
+  * [8e1a34e] Account for '.ddeb' dbgsym extension in debpackage regex.
+
+  [ Heinrich Schuchardt ]
+  * [aad441a] Correct the documentation for option experimental_release.
+    The default value is 0 (not None). (Closes: #820580)
+  * [cddf838] Add option backport_release to the configuration file.
+    If this option is set mini-dinstall writes
+    "NotAutomatic: yes" and "ButAutomaticUpgrades: yes"
+    to the Release file. (Closes: #820582)
+
+  [ Krytarik Raido ]
+  * [26c7a76] Reduce code duplication in ArchiveDir.
+
+  [ Guido Günther ]
+  * [0867275] Add gbp.conf
+
+ -- Guido Günther <agx@sigxcpu.org>  Tue, 05 Sep 2017 19:01:18 +0200
+
 mini-dinstall (0.6.30) unstable; urgency=low
 
   * [885f9fc] lintian: fix vcs-field-not-canonical
